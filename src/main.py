@@ -24,7 +24,7 @@ def main():
     light_dir = vec(-1, 0, 1)
 
     # floor
-    terrain = Terrain(tests_dir + "img/brown.png", tests_dir + "img/height.jpg", terrain_shader, light_dir=light_dir, k_d=(0.3, 0.3, 0))
+    terrain = Terrain(tests_dir + "img/brown.png", tests_dir + "img/height.jpg", terrain_shader, light_dir=light_dir, k_d=(0.3, 0.3, 0), size=100)
     viewer.add(terrain)
 
     # lapin pas éclairé

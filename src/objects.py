@@ -48,11 +48,11 @@ class TerrainAttributes:
         Compute the normal of the vertex at position (x, y, z)
         """
         # cf. video, retrouver la source ecrite
-        heightL = self.get_height(x-1, z)
-        heightR = self.get_height(x+1, z)
-        heightD = self.get_height(x, z-1)
-        heightU = self.get_height(x, z+1)
-        normal = vec(heightL - heightR, 2, heightD - heightU)
+        height_left = self.get_height(x-1, z)
+        height_right = self.get_height(x+1, z)
+        height_up = self.get_height(x, z-1)
+        height_down = self.get_height(x, z+1)
+        normal = vec(height_left - height_right, 2, height_up - height_down)
         return normal / np.linalg.norm(normal)
 
     def generate_attributes(self):
@@ -60,34 +60,47 @@ class TerrainAttributes:
         Generate the vertices, normals and indices to be
         passed to the shader
         """
-        vertex_count = self.height_map.size[0]
-        count = vertex_count**2
+        # number of vertices along one axis
+        number_vertices_x = self.height_map.size[0]
+        total_vertices = number_vertices_x**2
         vertex_pointer = 0
-        vertices = count * [0]
-        normals = count * [0]
-        for i in range(vertex_count):
-            for j in range(vertex_count):
-                tmp_x = j / (vertex_count - 1) * self.size
-                tmp_y = self.get_height(j, i)
-                tmp_z = i / (vertex_count - 1) * self.size
+
+        # result containers
+        vertices = total_vertices * [0]
+        normals = total_vertices * [0]
+
+        # positions and normals computation
+        for i in range(number_vertices_x):
+            for j in range(number_vertices_x):
+                x = j / (number_vertices_x - 1) * self.size
+                y = self.get_height(j, i)
+                z = i / (number_vertices_x - 1) * self.size
                 normal = self.compute_normal(j, i)
-                vertices[vertex_pointer] = (tmp_x, tmp_y, tmp_z)
+
+                vertices[vertex_pointer] = (x, y, z)
                 normals[vertex_pointer] = normal
                 vertex_pointer += 1
 
-        indices = (6 * (vertex_count - 1)**2) * [0]
-        pointer = 0
-        for gz in range(vertex_count-1):
-            for gx in range(vertex_count-1):
-                top_left = gz * vertex_count + gx
+        # centering the plane on (0, 0, 0)
+        vertices -= vec(self.size / 2, 0, self.size / 2)
+
+        # number of indices in the index array
+        indices = (6 * (number_vertices_x - 1)**2) * [0]
+        indices_pointer = 0
+
+        # indices computation
+        for z in range(number_vertices_x-1):
+            for x in range(number_vertices_x-1):
+                top_left = z * number_vertices_x + x
                 top_right = top_left + 1
-                bottom_left = (gz + 1) * vertex_count + gx
+                bottom_left = (z + 1) * number_vertices_x + x
                 bottom_right = bottom_left + 1
+
                 ind = [top_left, bottom_left, top_right, top_right, bottom_left, bottom_right]
                 for i in range(6):
-                    indices[pointer] = ind[i]
-                    pointer += 1
-        vertices -= vec(self.size / 2, 0, self.size / 2)
+                    indices[indices_pointer] = ind[i]
+                    indices_pointer += 1
+
         return vertices, normals, indices
 
 
