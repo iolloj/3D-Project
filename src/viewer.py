@@ -106,7 +106,7 @@ class VertexArray:
         GL.glDeleteBuffers(len(self.buffers), self.buffers)
 
 
-class Node:
+class Node_old:
     """ Scene graph transform and parameter broadcast node """
     def __init__(self, children=(), transform=identity()):
         self.transform = transform
@@ -124,6 +124,33 @@ class Node:
     def key_handler(self, key):
         """ Dispatch keyboard events to children """
         for child in self.children:
+            if hasattr(child, 'key_handler'):
+                child.key_handler(key)
+
+
+class Node:
+    """ Scene graph transform and parameter broadcast node """
+    def __init__(self, children=(), transform=identity()):
+        """ Using a dictionary to store the name, by default a number """
+        self.transform = transform
+        self.children = {}
+        for key, value in enumerate(list(iter(children))):
+            self.children[key] = value
+
+    def add(self, *drawables):
+        """ Add drawables to this node, simply updating children list """
+        assert len(drawables[0]) == 2, "Expected a name and a node"
+        tmp_dict = {drawable[0]: drawable[1] for drawable in drawables}
+        self.children.update(tmp_dict)
+
+    def draw(self, projection, view, model):
+        """ Recursive draw, passing down updated model matrix. """
+        for child in self.children.values():
+            child.draw(projection, view, model @ self.transform)
+
+    def key_handler(self, key):
+        """ Dispatch keyboard events to children """
+        for child in self.children.values():
             if hasattr(child, 'key_handler'):
                 child.key_handler(key)
 

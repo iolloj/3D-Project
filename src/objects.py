@@ -9,6 +9,82 @@ from viewer import *
 from meshes import *
 
 
+class Scene:
+    """ General scene class """
+    # Hierarchical structure not treated yet
+    def __init__(self, shaders_dir, light_dir, camera_dist):
+        """ Maybe add rotations in the viewer initialisation """
+        self.viewer = Viewer(distance = camera_dist)
+        self.shaders = {'color': Shader(shaders_dir+"color.vert", shaders_dir+"color.frag"),
+                        'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag")}
+        self.node = Node()
+        self.viewer.add(("root", self.node))
+        self.light_dir = light_dir
+        self.terrain = None
+
+    def generate_terrain(self, texture, height, max_height, size):
+        self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, size=size,
+                               light_dir=self.light_dir)
+        self.viewer.add(("terrain", self.terrain))
+
+    def add(self, obj):
+        obj.parent = self
+        name = obj.name
+        tmp = name + "_tmp"
+        new_node = Node(transform=obj.transform)
+        new_node.add((tmp, obj))
+        self.node.add((name, new_node))
+
+    def update_position(self, obj):
+        """ The entry in the dictionary is replaced """
+        obj.parent.add(obj)
+
+
+class Object:
+    """ Generic object """
+    # Hierarchical structure not well treated yet: when rescaling and translation, it seems to be
+    # translated by scale * translation
+    # En gros, il semblerait qu'il y ait un facteur multiplicatif en trop
+    def __init__(self, shader, name, obj_pos, light_dir=(0, 1, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None):
+        self.name = name
+        self.parent = None
+        self.mesh = load(obj_pos, shader, light_dir)
+        self.translation = translate(position)
+        self.scale = scale(scaling)
+        if rotation_mat is None:
+            self.rotation = rotate(rotation_axis, rotation_angle)
+        else:
+            self.rotation = rotation_mat
+        self.transform = self.translation @ self.rotation @ self.scale
+        self.node = Node()
+
+    def set_position(self, **kwargs):
+        """ Position has tu be updated in the scene class """
+        if "position" in kwargs.keys():
+            self.translation = translate(kwargs['position'])
+        if "scaling" in kwargs.keys():
+            self.scale = scale(kwargs['scaling'])
+        if "rotation_axis" in kwargs.keys() and "rotation_angle" in kwargs.keys():
+            self.rotation = rotate(kwargs['rotation_axis'], kwargs['rotation_angle'])
+        if "rotation_mat" in kwargs.keys():
+            self.rotation = kwargs['rotation_mat']
+        self.transform = self.translation @ self.rotation @ self.scale
+
+    def add(self, obj):
+        obj.parent = self
+        name = obj.name
+        tmp = name + "_tmp"
+        new_node = Node(transform=obj.transform)
+        new_node.add((tmp, obj))
+        self.node.add((name, new_node))
+
+    def draw(self, projection, view, model):
+        for mesh in self.mesh:
+            mesh.draw(projection, view, model)
+        for node in self.node.children.values():
+            node.draw(projection, view, model)
+
+
 class Cylinder(Node):
     """ Very simple cylinder based on practical 2 load function """
     def __init__(self, shader):

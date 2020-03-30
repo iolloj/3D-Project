@@ -30,7 +30,7 @@ def main():
     # lapin pas éclairé
     rabbit = Node(transform=translate(0, 1, 0))
     rabbit_rotation = RotationControlNode(glfw.KEY_RIGHT, glfw.KEY_LEFT, (0, 1, 0))
-    rabbit.add(*[mesh for mesh in load(tests_dir + "bunny/bunny.obj", shader)])
+    rabbit.add(*load(tests_dir + "bunny/bunny.obj", shader))
     rabbit_rotation.add(rabbit)
 
     cube = Node(transform=rotate((0, 1, 0), 45))
