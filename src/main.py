@@ -34,7 +34,7 @@ def main():
     rabbit_rotation.add(rabbit)
 
     cube = Node(transform=rotate((0, 1, 0), 45))
-    cube_rotation = RotationControlNode(glfw.KEY_UP, glfw.KEY_DOWN, (1, 0, 0))
+    cube_rotation = RotationControlNode(glfw.KEY_DOWN, glfw.KEY_UP, (1, 0, 0))
     cube.add(rabbit_rotation, *[mesh for mesh in load(tests_dir + "cube/cube.obj", shader, light_dir)])
     cube_rotation.add(cube)
 
