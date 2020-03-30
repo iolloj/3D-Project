@@ -5,59 +5,42 @@ from objects import *
 from nodes import *
 from meshes import *
 
-# -------------- main program and scene setup --------------------------------
+
 def main():
-    """ create a window, add scene objects, then run rendering loop """
-    viewer = Viewer(distance=10)
+    scene = Scene("../shaders/", light_dir=vec(0, 1, 0), camera_dist=100)
+    scene.generate_terrain("../tests/img/brown.png", "../tests/img/height.jpg", 10, 100)
 
-    shader_dir = "../shaders/"
-    tests_dir = "../tests/"
+    rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
 
-    shader = Shader(shader_dir + "color.vert", shader_dir + "color.frag")
-    terrain_shader = Shader(shader_dir + "terrain.vert", shader_dir + "terrain.frag")
+    cube1 = Object(scene.shaders['color'], "cube1", "../tests/cube/cube.obj", position=(0, 5, 0), rotation_mat=rotation_matrix, scaling=(0.5, 0.3, 0.7))
+    cube2 = Object(scene.shaders['color'], "cube2", '../tests/cube/cube.obj', position=(-5, 5, 3), scaling=(2, 2, 2))
+    rabbit1 = Object(scene.shaders['color'], "rabbit", "../tests/bunny/bunny.obj", position=(0, 1, 0))
+    cube3 = Object(scene.shaders['color'], "suzanne", "../tests/cube/cube.obj", position=(1, 1, 0))
+    rabbit2 = Object(scene.shaders['color'], "bis", "../tests/bunny/bunny.obj", position=(0, 1, 0))
 
-    translate_keys = {5: vec(0, 0, 0), 8: vec(1, 1, 0), 15: vec(0, 0, 0)}
-    rotate_keys = {5: quaternion(), 8: quaternion_from_euler(180, 45, 90),
-                   10: quaternion_from_euler(180, 0, 180), 15: quaternion()}
-    scale_keys = {5: 1, 8: 0.5, 15: 1}
+    cube2.add(rabbit1)
+    cube2.add(cube3)
+    rabbit1.add(rabbit2)
 
-    light_dir = vec(-1, 0, 1)
+    scene.add(cube1)
+    scene.add(cube2)
 
-    # floor
-    terrain = Terrain(tests_dir + "img/brown.png", tests_dir + "img/height.jpg", terrain_shader, light_dir=light_dir, k_d=(0.3, 0.3, 0), size=100)
-    viewer.add(terrain)
+    cube1.set_position(position=(-10, -5, 0), scaling=(15, 15, 15))
+    scene.update_position(cube1)
 
-    # lapin pas éclairé
-    rabbit = Node(transform=translate(0, 1, 0))
-    rabbit_rotation = RotationControlNode(glfw.KEY_RIGHT, glfw.KEY_LEFT, (0, 1, 0))
-    rabbit.add(*load(tests_dir + "bunny/bunny.obj", shader))
-    rabbit_rotation.add(rabbit)
+    cube2.set_position(position=(10, 10, 0), scaling=(10, 10, 10))
+    scene.update_position(cube2)
 
-    cube = Node(transform=rotate((0, 1, 0), 45))
-    cube_rotation = RotationControlNode(glfw.KEY_DOWN, glfw.KEY_UP, (1, 0, 0))
-    cube.add(rabbit_rotation, *[mesh for mesh in load(tests_dir + "cube/cube.obj", shader, light_dir)])
-    cube_rotation.add(cube)
+    rabbit1.set_position(position=(-1, 1, 0), scaling=(0.5, 0.5, 0.5))
+    scene.update_position(rabbit1)
 
-    cube_translation = Node(transform=translate(0, 1.5, 0))
-    cube_translation.add(cube_rotation)
+    cube1.set_position(position=(-9, -5, 0))
+    scene.update_position(cube1)
 
-    keynode = KeyFrameControlNode(translate_keys, rotate_keys, scale_keys)
-    keynode.add(cube_translation)
+    cube2.set_position(position=(9, 5, 0))
+    scene.update_position(cube2)
 
-    # chargement d'un objet sans texture
-    suzanne = Node(transform=translate(-2.5, 0, 0))
-    suzanne.add(*[mesh for mesh in load(tests_dir + "suzanne/suzanne.obj", shader, light_dir)])
-    viewer.add(suzanne)
-
-    # chargement d'un objet sans texture et sans couleur
-    suzanne_uncolored = Node(transform=translate(-2.5, 2, 0) @ scale(0.6, 0.6, 0.6))
-    suzanne_uncolored.add(*[mesh for mesh in load(tests_dir + "suzanne/suzanne_uncolored.obj", shader, light_dir)])
-    viewer.add(suzanne_uncolored)
-
-    viewer.add(keynode)
-
-    # start rendering loop
-    viewer.run()
+    scene.viewer.run()
 
 
 if __name__ == '__main__':
