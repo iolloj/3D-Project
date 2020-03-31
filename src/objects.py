@@ -34,6 +34,16 @@ class Scene:
         called either rotation_control or keyframes
         """
         obj.parent = self
+        # check if the arguments have valid names
+        try:
+            names = ["rotation_control", "keyframes"]
+            for key in animation.keys():
+                if key not in names:
+                    raise KeyError
+        except KeyError:
+            print("KeyError: expected names 'rotation_control' or 'keyframes' in Scene.add()")
+            raise
+            sys.exit(1)
         # update the dictionaries
         if "rotation_control" in animation.keys():
             obj.rotation_control.update(animation['rotation_control'])
@@ -109,6 +119,16 @@ class Object:
         """
         obj.parent = self
         name = obj.name
+        # check if the arguments have valid names
+        try:
+            names = ["rotation_control", "keyframes"]
+            for key in kwargs.keys():
+                if key not in names:
+                    raise KeyError
+        except KeyError:
+            print("KeyError: expected names 'rotation_control' or 'keyframes' in Object.add()")
+            raise
+            sys.exit(1)
         # update the dictionaries
         if "rotation_control" in kwargs.keys():
             obj.rotation_control.update(kwargs['rotation_control'])
