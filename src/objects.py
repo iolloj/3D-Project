@@ -28,26 +28,44 @@ class Scene:
                                light_dir=self.light_dir)
         self.viewer.add(("terrain", self.terrain))
 
-    def add(self, obj, **rotation_control):
-        """ Crée ds objets qui ne devraient pas exister avec les param par défaut """
+    def add(self, obj, **animation):
         obj.parent = self
-        obj.rotation_control.update(rotation_control)
+        # update the dictionaries
+        if "rotation_control" in animation.keys():
+            obj.rotation_control.update(animation['rotation_control'])
+        if "keyframes" in animation.keys():
+            obj.keyframes.update(animation['keyframes'])
         name = obj.name
         tmp = name + "_tmp"
         rot = name + "_rot"
+        keyframe = name + "_keyframe"
         new_node = Node(transform=obj.transform)
         new_node.add((tmp, obj))
         if obj.rotation_control['rotation_control']:
             rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
                                                 obj.rotation_control['axis'], obj.rotation_control['angle'])
             rotation_node.add((rot, new_node))
-            self.node.add((name, rotation_node))
+            # add another node if there is a keyframe animation
+            if obj.keyframes['keyframes']:
+                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                              obj.keyframes['scale_keys'])
+                keynode.add((rot, rotation_node))
+                self.node.add((keyframe, keynode))
+            else:
+                self.node.add((name, rotation_node))
         else:
-            self.node.add((name, new_node))
+            # add another node if there is a keyframe animation
+            if obj.keyframes['keyframes']:
+                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                              obj.keyframes['scale_keys'])
+                keynode.add((name, new_node))
+                self.node.add((keyframe, keynode))
+            else:
+                self.node.add((name, new_node))
 
     def update_position(self, obj):
         """ The entry in the dictionary is replaced """
-        obj.parent.add(obj, **obj.rotation_control)
+        obj.parent.add(obj, rotation_control=obj.rotation_control)
 
 
 class Object:
@@ -66,9 +84,10 @@ class Object:
         self.node = Node()
         self.rotation_control = {"rotation_control": False, "key_up": glfw.KEY_RIGHT, "key_down": glfw.KEY_LEFT,
                                  "axis": (0, 1, 0), "angle": 0}
+        self.keyframes = {"keyframes": False, "translate_keys": None, "rotate_keys": None, "scale_keys": None}
 
     def set_position(self, **kwargs):
-        """ Position has tu be updated in the scene class """
+        """ Position has to be updated in the scene class """
         if "position" in kwargs.keys():
             self.translation = translate(kwargs['position'])
         if "scaling" in kwargs.keys():
@@ -79,20 +98,42 @@ class Object:
             self.rotation = kwargs['rotation_mat']
         self.transform = self.translation @ self.rotation @ self.scale
 
-    def add(self, obj, rotation_control=False, key_up=glfw.KEY_RIGHT, key_down=glfw.KEY_LEFT, axis=(0, 1, 0), angle=0):
-        """ Problème d'initialisation d'objets avec RotationControlNode """
+    def add(self, obj, **kwargs):#rotation_control=False, key_up=glfw.KEY_RIGHT, key_down=glfw.KEY_LEFT, axis=(0, 1, 0), angle=0):
+        """ Changer la structure : utiliser un dict pour rotation_control et un pour keyframe ? Ou un **args et chaque arg est un dico nommé """
+        # Gérer le placement du noeud, faire de même dans Scene
         obj.parent = self
         name = obj.name
+        # update the dictionaries
+        if "rotation_control" in kwargs.keys():
+            obj.rotation_control.update(kwargs['rotation_control'])
+        if "keyframes" in kwargs.keys():
+            obj.keyframes.update(kwargs['keyframes'])
         tmp = name + "_tmp"
         rot = name + "_rot"
+        keyframe = name + "_keyframe"
         new_node = Node(transform=obj.transform)
         new_node.add((tmp, obj))
-        if rotation_control:
-            rotation_node = RotationControlNode(key_up, key_down, axis, angle)
+        if obj.rotation_control['rotation_control']:
+            rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
+                                                obj.rotation_control['axis'], obj.rotation_control['angle'])
             rotation_node.add((name, new_node))
-            self.node.add((rot, rotation_node))
+            # add another node if there is a keyframe animation
+            if obj.keyframes['keyframes']:
+                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                              obj.keyframes['scale_keys'])
+                keynode.add((rot, rotation_node))
+                self.node.add((keyframe, keynode))
+            else:
+                self.node.add((rot, rotation_node))
         else:
-            self.node.add((name, new_node))
+            # add another node if there is a keyframe animation
+            if obj.keyframes['keyframes']:
+                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                              obj.keyframes['scale_keys'])
+                keynode.add((name, new_node))
+                self.node.add((keyframe, keynode))
+            else:
+                self.node.add((name, new_node))
 
     def draw(self, projection, view, model):
         for mesh in self.mesh:
