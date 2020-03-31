@@ -184,6 +184,7 @@ class Texture:
 
 class KeyFrames:
     """ Stores keyframe pairs for any value type with interpolation_function"""
+    ### Add time management for loops or why not infinite loops?
     def __init__(self, time_value_pairs, interpolation_function=lerp):
         if isinstance(time_value_pairs, dict):  # convert to list of pairs
             time_value_pairs = time_value_pairs.items()
@@ -191,6 +192,7 @@ class KeyFrames:
         self.times, self.values = zip(*keyframes)  # pairs list -> 2 lists
         self.interpolate = interpolation_function
 
+    ### Change the interpolation method!
     def value(self, time):
         """ Computes interpolated value from keyframes, for a given time """
 

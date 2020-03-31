@@ -29,6 +29,10 @@ class Scene:
         self.viewer.add(("terrain", self.terrain))
 
     def add(self, obj, **animation):
+        """
+        Other arguments than obj have to be named and the named arguments have to be 
+        called either rotation_control or keyframes
+        """
         obj.parent = self
         # update the dictionaries
         if "rotation_control" in animation.keys():
@@ -98,9 +102,11 @@ class Object:
             self.rotation = kwargs['rotation_mat']
         self.transform = self.translation @ self.rotation @ self.scale
 
-    def add(self, obj, **kwargs):#rotation_control=False, key_up=glfw.KEY_RIGHT, key_down=glfw.KEY_LEFT, axis=(0, 1, 0), angle=0):
-        """ Changer la structure : utiliser un dict pour rotation_control et un pour keyframe ? Ou un **args et chaque arg est un dico nommé """
-        # Gérer le placement du noeud, faire de même dans Scene
+    def add(self, obj, **kwargs):
+        """
+        Other arguments than obj have to be named and the named arguments have to be 
+        called either rotation_control or keyframes
+        """
         obj.parent = self
         name = obj.name
         # update the dictionaries
