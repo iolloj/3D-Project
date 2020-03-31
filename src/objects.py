@@ -7,6 +7,7 @@ peut-etre probleme lie aux normales
 
 from viewer import *
 from meshes import *
+from nodes import *
 
 
 class Scene:
@@ -27,24 +28,30 @@ class Scene:
                                light_dir=self.light_dir)
         self.viewer.add(("terrain", self.terrain))
 
-    def add(self, obj):
+    def add(self, obj, **rotation_control):
+        """ Crée ds objets qui ne devraient pas exister avec les param par défaut """
         obj.parent = self
+        obj.rotation_control.update(rotation_control)
         name = obj.name
         tmp = name + "_tmp"
+        rot = name + "_rot"
         new_node = Node(transform=obj.transform)
         new_node.add((tmp, obj))
-        self.node.add((name, new_node))
+        if obj.rotation_control['rotation_control']:
+            rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
+                                                obj.rotation_control['axis'], obj.rotation_control['angle'])
+            rotation_node.add((rot, new_node))
+            self.node.add((name, rotation_node))
+        else:
+            self.node.add((name, new_node))
 
     def update_position(self, obj):
         """ The entry in the dictionary is replaced """
-        obj.parent.add(obj)
+        obj.parent.add(obj, **obj.rotation_control)
 
 
 class Object:
     """ Generic object """
-    # Hierarchical structure not well treated yet: when rescaling and translation, it seems to be
-    # translated by scale * translation
-    # En gros, il semblerait qu'il y ait un facteur multiplicatif en trop
     def __init__(self, shader, name, obj_pos, light_dir=(0, 1, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None):
         self.name = name
         self.parent = None
@@ -57,6 +64,8 @@ class Object:
             self.rotation = rotation_mat
         self.transform = self.translation @ self.rotation @ self.scale
         self.node = Node()
+        self.rotation_control = {"rotation_control": False, "key_up": glfw.KEY_RIGHT, "key_down": glfw.KEY_LEFT,
+                                 "axis": (0, 1, 0), "angle": 0}
 
     def set_position(self, **kwargs):
         """ Position has tu be updated in the scene class """
@@ -70,19 +79,32 @@ class Object:
             self.rotation = kwargs['rotation_mat']
         self.transform = self.translation @ self.rotation @ self.scale
 
-    def add(self, obj):
+    def add(self, obj, rotation_control=False, key_up=glfw.KEY_RIGHT, key_down=glfw.KEY_LEFT, axis=(0, 1, 0), angle=0):
+        """ Problème d'initialisation d'objets avec RotationControlNode """
         obj.parent = self
         name = obj.name
         tmp = name + "_tmp"
+        rot = name + "_rot"
         new_node = Node(transform=obj.transform)
         new_node.add((tmp, obj))
-        self.node.add((name, new_node))
+        if rotation_control:
+            rotation_node = RotationControlNode(key_up, key_down, axis, angle)
+            rotation_node.add((name, new_node))
+            self.node.add((rot, rotation_node))
+        else:
+            self.node.add((name, new_node))
 
     def draw(self, projection, view, model):
         for mesh in self.mesh:
             mesh.draw(projection, view, model)
         for node in self.node.children.values():
             node.draw(projection, view, model)
+
+    def key_handler(self, key):
+        """ Dispatch keyboard events to children """
+        for child in self.node.children.values():
+            if hasattr(child, 'key_handler'):
+                child.key_handler(key)
 
 
 class Cylinder(Node):

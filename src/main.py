@@ -19,11 +19,11 @@ def main():
     rabbit2 = Object(scene.shaders['color'], "bis", "../tests/bunny/bunny.obj", position=(0, 1, 0))
 
     cube2.add(rabbit1)
-    cube2.add(cube3)
+    cube2.add(cube3, rotation_control=True)
     rabbit1.add(rabbit2)
 
     scene.add(cube1)
-    scene.add(cube2)
+    scene.add(cube2, rotation_control=True, key_up=glfw.KEY_UP, key_down=glfw.KEY_DOWN, axis=(1, 0, 0))
 
     cube1.set_position(position=(-10, -5, 0), scaling=(15, 15, 15))
     scene.update_position(cube1)
