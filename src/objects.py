@@ -102,6 +102,16 @@ class Object:
 
     def set_position(self, **kwargs):
         """ Position has to be updated in the scene class """
+        # check if the arguments have valid names
+        try:
+            names = ["position", "scaling", "rotation_axis", "rotation_angle", "rotation_mat"]
+            for key in kwargs.keys():
+                if key not in names:
+                    raise KeyError
+        except KeyError:
+            print("KeyError: expected names 'position', 'scaling', 'rotation_axis', 'rotation_angle' or 'rotation_mat' in Object.set_position()")
+            raise
+            sys.exit(1)
         if "position" in kwargs.keys():
             self.translation = translate(kwargs['position'])
         if "scaling" in kwargs.keys():
