@@ -84,10 +84,10 @@ class Scene:
 
 class Object:
     """ Generic object """
-    def __init__(self, shader, name, obj_pos, light_dir=(0, 1, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None):
+    def __init__(self, shader, name, obj_pos, light_dir=(0, 1, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None):
         self.name = name
         self.parent = None
-        self.mesh = load(obj_pos, shader, light_dir)
+        self.mesh = load(obj_pos, shader, light_dir, tex_file)
         self.translation = translate(position)
         self.scale = scale(scaling)
         if rotation_mat is None:
