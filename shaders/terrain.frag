@@ -25,9 +25,9 @@ out vec4 out_color;
 
 void main() {
     // Object frame
-    //vec3 n = normalize(w_normal);
+    vec3 n = normalize(w_normal);
     // World frame
-    vec3 n = normalize(my_normal);
+    //vec3 n = normalize(my_normal);
 
     vec3 l = normalize(light_dir);
     vec3 r = reflect(-l, n);

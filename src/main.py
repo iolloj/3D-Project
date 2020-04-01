@@ -7,8 +7,8 @@ from meshes import *
 
 
 def main():
-    scene = Scene("../shaders/", light_dir=vec(0, 1, 0), camera_dist=100)
-    scene.generate_terrain("../tests/img/brown.png", "../tests/img/height.jpg", 10, 100)
+    scene = Scene("../shaders/", light_dir=vec(0, 0, 1), camera_dist=100)
+    scene.generate_terrain("../tests/img/sand.jpg", "../tests/img/height.jpg", 10, 100)
 
     rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
     anim = {"rotation_control": True, "key_up": glfw.KEY_UP, "key_down": glfw.KEY_DOWN, "axis": (1, 0, 0)}
@@ -49,6 +49,7 @@ def main():
 
 
 if __name__ == '__main__':
+    # Soucis d'illumination sur les cubes on dirait, toujours le dessus peut importe la direction
     glfw.init()                # initialize window system glfw
     main()                     # main function keeps variables locally scoped
     glfw.terminate()           # destroy all glfw windows and GL contexts

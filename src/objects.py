@@ -273,7 +273,7 @@ class Terrain(Mesh):
     """ Simple first textured object """
     # Ajouter assertion si fichiers non trouvés
     def __init__(self, texture_map, height_map, shader, max_color = 256, max_height = 10, size = 50,
-                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(1, 1, 1), s=16):
+                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
         self.attrib = TerrainAttributes(texture_map, height_map, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
 
