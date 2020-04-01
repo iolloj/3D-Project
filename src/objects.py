@@ -28,54 +28,55 @@ class Scene:
                                light_dir=self.light_dir)
         self.viewer.add(("terrain", self.terrain))
 
-    def add(self, obj, **animation):
+    def add(self, *objects, **animation):
         """
         Other arguments than obj have to be named and the named arguments have to be 
         called either rotation_control or keyframes
         """
-        obj.parent = self
-        # check if the arguments have valid names
-        try:
-            names = ["rotation_control", "keyframes"]
-            for key in animation.keys():
-                if key not in names:
-                    raise KeyError
-        except KeyError:
-            print("KeyError: expected names 'rotation_control' or 'keyframes' in Scene.add()")
-            raise
-            sys.exit(1)
-        # update the dictionaries
-        if "rotation_control" in animation.keys():
-            obj.rotation_control.update(animation['rotation_control'])
-        if "keyframes" in animation.keys():
-            obj.keyframes.update(animation['keyframes'])
-        name = obj.name
-        tmp = name + "_tmp"
-        rot = name + "_rot"
-        keyframe = name + "_keyframe"
-        new_node = Node(transform=obj.transform)
-        new_node.add((tmp, obj))
-        if obj.rotation_control['rotation_control']:
-            rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
-                                                obj.rotation_control['axis'], obj.rotation_control['angle'])
-            rotation_node.add((rot, new_node))
-            # add another node if there is a keyframe animation
-            if obj.keyframes['keyframes']:
-                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
-                                              obj.keyframes['scale_keys'])
-                keynode.add((rot, rotation_node))
-                self.node.add((keyframe, keynode))
+        for obj in objects:
+            obj.parent = self
+            # check if the arguments have valid names
+            try:
+                names = ["rotation_control", "keyframes"]
+                for key in animation.keys():
+                    if key not in names:
+                        raise KeyError
+            except KeyError:
+                print("KeyError: expected names 'rotation_control' or 'keyframes' in Scene.add()")
+                raise
+                sys.exit(1)
+            # update the dictionaries
+            if "rotation_control" in animation.keys():
+                obj.rotation_control.update(animation['rotation_control'])
+            if "keyframes" in animation.keys():
+                obj.keyframes.update(animation['keyframes'])
+            name = obj.name
+            tmp = name + "_tmp"
+            rot = name + "_rot"
+            keyframe = name + "_keyframe"
+            new_node = Node(transform=obj.transform)
+            new_node.add((tmp, obj))
+            if obj.rotation_control['rotation_control']:
+                rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
+                                                    obj.rotation_control['axis'], obj.rotation_control['angle'])
+                rotation_node.add((rot, new_node))
+                # add another node if there is a keyframe animation
+                if obj.keyframes['keyframes']:
+                    keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                                  obj.keyframes['scale_keys'])
+                    keynode.add((rot, rotation_node))
+                    self.node.add((keyframe, keynode))
+                else:
+                    self.node.add((name, rotation_node))
             else:
-                self.node.add((name, rotation_node))
-        else:
-            # add another node if there is a keyframe animation
-            if obj.keyframes['keyframes']:
-                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
-                                              obj.keyframes['scale_keys'])
-                keynode.add((name, new_node))
-                self.node.add((keyframe, keynode))
-            else:
-                self.node.add((name, new_node))
+                # add another node if there is a keyframe animation
+                if obj.keyframes['keyframes']:
+                    keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                                  obj.keyframes['scale_keys'])
+                    keynode.add((name, new_node))
+                    self.node.add((keyframe, keynode))
+                else:
+                    self.node.add((name, new_node))
 
     def update_position(self, obj):
         """ The entry in the dictionary is replaced """
@@ -84,7 +85,8 @@ class Scene:
 
 class Object:
     """ Generic object """
-    def __init__(self, shader, name, obj_pos, light_dir=(0, 1, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None):
+    def __init__(self, shader, name, obj_pos, light_dir=(0, 0, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None):
+        # Maybe using **kwargs to pass a dictionary
         self.name = name
         self.parent = None
         self.mesh = load(obj_pos, shader, light_dir, tex_file)
@@ -122,54 +124,55 @@ class Object:
             self.rotation = kwargs['rotation_mat']
         self.transform = self.translation @ self.rotation @ self.scale
 
-    def add(self, obj, **kwargs):
+    def add(self, *objects, **kwargs):
         """
         Other arguments than obj have to be named and the named arguments have to be 
         called either rotation_control or keyframes
         """
-        obj.parent = self
-        name = obj.name
-        # check if the arguments have valid names
-        try:
-            names = ["rotation_control", "keyframes"]
-            for key in kwargs.keys():
-                if key not in names:
-                    raise KeyError
-        except KeyError:
-            print("KeyError: expected names 'rotation_control' or 'keyframes' in Object.add()")
-            raise
-            sys.exit(1)
-        # update the dictionaries
-        if "rotation_control" in kwargs.keys():
-            obj.rotation_control.update(kwargs['rotation_control'])
-        if "keyframes" in kwargs.keys():
-            obj.keyframes.update(kwargs['keyframes'])
-        tmp = name + "_tmp"
-        rot = name + "_rot"
-        keyframe = name + "_keyframe"
-        new_node = Node(transform=obj.transform)
-        new_node.add((tmp, obj))
-        if obj.rotation_control['rotation_control']:
-            rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
-                                                obj.rotation_control['axis'], obj.rotation_control['angle'])
-            rotation_node.add((name, new_node))
-            # add another node if there is a keyframe animation
-            if obj.keyframes['keyframes']:
-                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
-                                              obj.keyframes['scale_keys'])
-                keynode.add((rot, rotation_node))
-                self.node.add((keyframe, keynode))
+        for obj in objects:
+            obj.parent = self
+            name = obj.name
+            # check if the arguments have valid names
+            try:
+                names = ["rotation_control", "keyframes"]
+                for key in kwargs.keys():
+                    if key not in names:
+                        raise KeyError
+            except KeyError:
+                print("KeyError: expected names 'rotation_control' or 'keyframes' in Object.add()")
+                raise
+                sys.exit(1)
+            # update the dictionaries
+            if "rotation_control" in kwargs.keys():
+                obj.rotation_control.update(kwargs['rotation_control'])
+            if "keyframes" in kwargs.keys():
+                obj.keyframes.update(kwargs['keyframes'])
+            tmp = name + "_tmp"
+            rot = name + "_rot"
+            keyframe = name + "_keyframe"
+            new_node = Node(transform=obj.transform)
+            new_node.add((tmp, obj))
+            if obj.rotation_control['rotation_control']:
+                rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
+                                                    obj.rotation_control['axis'], obj.rotation_control['angle'])
+                rotation_node.add((name, new_node))
+                # add another node if there is a keyframe animation
+                if obj.keyframes['keyframes']:
+                    keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                                  obj.keyframes['scale_keys'])
+                    keynode.add((rot, rotation_node))
+                    self.node.add((keyframe, keynode))
+                else:
+                    self.node.add((rot, rotation_node))
             else:
-                self.node.add((rot, rotation_node))
-        else:
-            # add another node if there is a keyframe animation
-            if obj.keyframes['keyframes']:
-                keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
-                                              obj.keyframes['scale_keys'])
-                keynode.add((name, new_node))
-                self.node.add((keyframe, keynode))
-            else:
-                self.node.add((name, new_node))
+                # add another node if there is a keyframe animation
+                if obj.keyframes['keyframes']:
+                    keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                                  obj.keyframes['scale_keys'])
+                    keynode.add((name, new_node))
+                    self.node.add((keyframe, keynode))
+                else:
+                    self.node.add((name, new_node))
 
     def draw(self, projection, view, model):
         for mesh in self.mesh:
