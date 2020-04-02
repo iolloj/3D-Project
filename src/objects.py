@@ -124,7 +124,7 @@ class Object:
             self.rotation = kwargs['rotation_mat']
         self.transform = self.translation @ self.rotation @ self.scale
 
-    def add(self, *objects, **kwargs):
+    def add(self, *objects, **animation):
         """
         Other arguments than obj have to be named and the named arguments have to be 
         called either rotation_control or keyframes
@@ -135,7 +135,7 @@ class Object:
             # check if the arguments have valid names
             try:
                 names = ["rotation_control", "keyframes"]
-                for key in kwargs.keys():
+                for key in animation.keys():
                     if key not in names:
                         raise KeyError
             except KeyError:
@@ -143,10 +143,10 @@ class Object:
                 raise
                 sys.exit(1)
             # update the dictionaries
-            if "rotation_control" in kwargs.keys():
-                obj.rotation_control.update(kwargs['rotation_control'])
-            if "keyframes" in kwargs.keys():
-                obj.keyframes.update(kwargs['keyframes'])
+            if "rotation_control" in animation.keys():
+                obj.rotation_control.update(animation['rotation_control'])
+            if "keyframes" in animation.keys():
+                obj.keyframes.update(animation['keyframes'])
             tmp = name + "_tmp"
             rot = name + "_rot"
             keyframe = name + "_keyframe"
