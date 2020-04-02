@@ -15,10 +15,10 @@ from meshes import *
 
 def main():
     # Scene creation
-    scene = Scene("../shaders/", light_dir=(0, 1, 1), camera_dist=100)
+    scene = Scene("../shaders/", light_dir=(0, 1, 1), camera_dist=2000)
     
     # Terrain generation
-    scene.generate_terrain("img/sand.jpg", "img/height.jpg", 100, 1000)
+    scene.generate_terrain("img/sand.jpg", "img/perlin_noise.png", 2000, 10000)
 
     scene.viewer.run()
 
