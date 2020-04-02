@@ -13,9 +13,14 @@ from nodes import *
 from meshes import *
 
 
+# Maye check that the illumination is propagated to the children
+# To do so, an attribute self.light_dir and a method load_mesh should be created but then 
+# the method would not be called in the object initialization and would lead to an uglier code
+# Or, the object should be created again with the new mesh
+
+
 def main():
     # Scene creation
-    # Maye check that the illumination is propagated to the children
     scene = Scene("../shaders/", light_dir=(0, 0, 0), camera_dist=7)
 
     # Shader
