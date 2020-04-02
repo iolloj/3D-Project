@@ -13,7 +13,7 @@ from nodes import *
 from meshes import *
 
 ##### Problems
-# When adding the granit_cube, there is more illumination on illuminated objects, why?
+# When adding the granit_cube, there is more illumination on illuminated objects, why? Even worse with the rabbit
 # It may be due to default parameters, or some kind of parameters initialization: check load and Object
 
 def main():
@@ -38,7 +38,6 @@ def main():
     # Updating position
     granit_cube.set_position(position=(1, 1.5, 0))
     scene.update_position(granit_cube)
-
 
     scene.viewer.run()
 

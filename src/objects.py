@@ -12,7 +12,6 @@ from nodes import *
 
 class Scene:
     """ General scene class """
-    # Hierarchical structure not treated yet
     def __init__(self, shaders_dir, light_dir, camera_dist):
         """ Maybe add rotations in the viewer initialisation """
         self.viewer = Viewer(distance = camera_dist)
