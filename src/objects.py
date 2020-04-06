@@ -247,11 +247,21 @@ class Surface(Mesh):
 
 
 class Attributes:
+    # Ce serait bien de pouvoir mettre compute_normal dans cette classe (trouver un moyen
+    # de les calculer indépendamment de la height_map ?)
     def __init__(self, texture_map, max_color, max_height, size):
         self.texture_map = Image.open(texture_map).convert('RGBA')
         self.max_color = max_color
         self.max_height = max_height
         self.size = size
+
+
+class TerrainAttributes(Attributes):
+    def __init__(self, texture_map, height_map, max_color, max_height, size):
+        super().__init__(texture_map, max_color, max_height, size)
+        height = Image.open(height_map).convert('L')
+        # crop to a square height_map
+        self.height_map = height.crop((0, 0, min(height.size), min(height.size)))
 
     def get_height(self, x, z):
         """
@@ -281,14 +291,6 @@ class Attributes:
         height_down = self.get_height(x, z+1)
         normal = vec(height_left - height_right, 2, height_up - height_down)
         return normal / np.linalg.norm(normal)
-
-
-class TerrainAttributes(Attributes):
-    def __init__(self, texture_map, height_map, max_color, max_height, size):
-        super().__init__(texture_map, max_color, max_height, size)
-        height = Image.open(height_map).convert('L')
-        # crop to a square height_map
-        self.height_map = height.crop((0, 0, min(height.size), min(height.size)))
 
     def generate_attributes(self):
         """
