@@ -5,6 +5,9 @@ petit souci avec la lumière on dirait, pour la direction?
 peut-etre probleme lie aux normales
 """
 
+import copy
+import random
+
 from viewer import *
 from meshes import *
 from nodes import *
@@ -33,49 +36,74 @@ class Scene:
         called either rotation_control or keyframes
         """
         for obj in objects:
-            obj.parent = self
             # check if the arguments have valid names
             try:
-                names = ["rotation_control", "keyframes"]
+                names = ["rotation_control", "keyframes", "place_boids"]
                 for key in animation.keys():
                     if key not in names:
                         raise KeyError
             except KeyError:
-                print("KeyError: expected names 'rotation_control' or 'keyframes' in Scene.add()")
+                print("KeyError: expected names 'rotation_control', 'keyframes' or 'place_boids' in Scene.add()")
                 raise
                 sys.exit(1)
-            # update the dictionaries
-            if "rotation_control" in animation.keys():
-                obj.rotation_control.update(animation['rotation_control'])
-            if "keyframes" in animation.keys():
-                obj.keyframes.update(animation['keyframes'])
-            name = obj.name
-            tmp = name + "_tmp"
-            rot = name + "_rot"
-            keyframe = name + "_keyframe"
-            new_node = Node(transform=obj.transform)
-            new_node.add((tmp, obj))
-            if obj.rotation_control['rotation_control']:
-                rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
-                                                    obj.rotation_control['axis'], obj.rotation_control['angle'])
-                rotation_node.add((rot, new_node))
-                # add another node if there is a keyframe animation
-                if obj.keyframes['keyframes']:
-                    keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
-                                                  obj.keyframes['scale_keys'])
-                    keynode.add((rot, rotation_node))
-                    self.node.add((keyframe, keynode))
-                else:
-                    self.node.add((name, rotation_node))
+
+            # placing the boids in the scene
+            if isinstance(obj, Boids):
+                transform = identity()
+                if "place_boids" in animation.keys():
+                    place_boids = animation['place_boids']
+                    if "position" in place_boids.keys():
+                        boid_position = translate(place_boids['position'])
+                    else:
+                        boid_position = identity()
+                    if "scaling" in place_boids.keys():
+                        boid_scaling = scale(place_boids['scaling'])
+                    else:
+                        boid_scaling = identity()
+                    if "rotation_axis" and "rotation_angle" in place_boids.keys():
+                        boid_rotation = rotate(place_boids['rotation_axis'], place_boids['rotation_angle'])
+                    else:
+                        boid_rotation = identity()
+                    transform = boid_position @ boid_rotation @ boid_scaling
+                new_node = Node(transform=transform)
+                new_node.add(("boids"+str(obj.index), obj))
+                self.node.add(("Boid"+str(obj.index), new_node))
+
+            # placing the objects in the scene
             else:
-                # add another node if there is a keyframe animation
-                if obj.keyframes['keyframes']:
-                    keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
-                                                  obj.keyframes['scale_keys'])
-                    keynode.add((name, new_node))
-                    self.node.add((keyframe, keynode))
+                obj.parent = self
+                # update the dictionaries
+                if "rotation_control" in animation.keys():
+                    obj.rotation_control.update(animation['rotation_control'])
+                if "keyframes" in animation.keys():
+                    obj.keyframes.update(animation['keyframes'])
+                name = obj.name
+                tmp = name + "_tmp"
+                rot = name + "_rot"
+                keyframe = name + "_keyframe"
+                new_node = Node(transform=obj.transform)
+                new_node.add((tmp, obj))
+                if obj.rotation_control['rotation_control']:
+                    rotation_node = RotationControlNode(obj.rotation_control['key_up'], obj.rotation_control['key_down'],
+                                                        obj.rotation_control['axis'], obj.rotation_control['angle'])
+                    rotation_node.add((rot, new_node))
+                    # add another node if there is a keyframe animation
+                    if obj.keyframes['keyframes']:
+                        keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                                    obj.keyframes['scale_keys'])
+                        keynode.add((rot, rotation_node))
+                        self.node.add((keyframe, keynode))
+                    else:
+                        self.node.add((name, rotation_node))
                 else:
-                    self.node.add((name, new_node))
+                    # add another node if there is a keyframe animation
+                    if obj.keyframes['keyframes']:
+                        keynode = KeyFrameControlNode(obj.keyframes['translate_keys'], obj.keyframes['rotate_keys'],
+                                                    obj.keyframes['scale_keys'])
+                        keynode.add((name, new_node))
+                        self.node.add((keyframe, keynode))
+                    else:
+                        self.node.add((name, new_node))
 
     def update_position(self, obj):
         """ The entry in the dictionary is replaced """
@@ -372,3 +400,53 @@ class Water(Surface):
     # TODO
     def __init__(self):
         pass
+
+
+class Boids:
+    """
+    Testing phase
+    """
+    def __init__(self, shader, number, model, scale, index):
+        """
+        For now, number has to be a perfect cube
+        """
+        self.index = index      # used in Scene.add
+        self.number = number
+        self.positions = []
+        self.boids = []
+
+        n = round(number ** (1./3))
+
+        for i in range(n):
+            for j in range(n):
+                for k in range(n):
+                    # positioning and centering the cluster
+                    self.positions.append((i - (n-1) / 2, j - (n-1) / 2, k - (n-1) / 2))
+
+        for i in range(number):
+            self.boids.append(Object(shader, "boid_{}".format(i), model, position=self.positions[i], scaling=(scale, scale, scale)))
+
+        # To change
+        # fish1 = Object(shader, "fish1", "../tests/obj/cube/cube.obj")
+        # fish2 = Object(shader, "fish2", "../tests/obj/cube/cube.obj", position=(1.5, 1.5, -1.5))
+        # fish3 = Object(shader, "fish3", "../tests/obj/cube/cube.obj", position=(-1.5, 2, 1.5))
+        # self.boids = [fish1, fish2, fish3]
+        self.transforms = [boid.transform for boid in self.boids]
+
+    def update_positions(self, time):
+        # pas ce qu'on veut, simples tests
+        copied = copy.deepcopy(self.transforms)
+        if int(time % 4) == 0:
+            print("A")
+            for index, (boid, transform) in enumerate(zip(self.boids, copied)):
+                boid.transform = translate(index, index, -index)
+        elif int(time % 4) == 2:
+            print("B")
+            for boid, transform in zip(self.boids, copied):
+                boid.transform = transform
+
+    def draw(self, projection, view, model):
+        # self.update_positions(glfw.get_time())
+        for boid in self.boids:
+            # chelou mais ça marche
+            boid.draw(projection, view, model @ boid.transform)
