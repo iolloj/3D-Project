@@ -426,14 +426,9 @@ class Boids:
         for i in range(number):
             self.boids.append(Object(shader, "boid_{}".format(i), model, position=self.positions[i], scaling=(scale, scale, scale)))
 
-        # To change
-        # fish1 = Object(shader, "fish1", "../tests/obj/cube/cube.obj")
-        # fish2 = Object(shader, "fish2", "../tests/obj/cube/cube.obj", position=(1.5, 1.5, -1.5))
-        # fish3 = Object(shader, "fish3", "../tests/obj/cube/cube.obj", position=(-1.5, 2, 1.5))
-        # self.boids = [fish1, fish2, fish3]
         self.transforms = [boid.transform for boid in self.boids]
 
-    def update_positions(self, time):
+    def tests(self, time):
         # pas ce qu'on veut, simples tests
         copied = copy.deepcopy(self.transforms)
         if int(time % 4) == 0:
@@ -445,8 +440,12 @@ class Boids:
             for boid, transform in zip(self.boids, copied):
                 boid.transform = transform
 
+    def update_positions(self, time):
+        pass
+
     def draw(self, projection, view, model):
-        # self.update_positions(glfw.get_time())
+        # self.tests(glfw.get_time())
+        self.update_positions(glfw.get_time())
         for boid in self.boids:
             # chelou mais ça marche
             boid.draw(projection, view, model @ boid.transform)
