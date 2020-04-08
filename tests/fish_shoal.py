@@ -21,11 +21,8 @@ def main():
     color_shader = scene.shaders['color']
 
     # Boids
-    boids = Boids(color_shader, 27, "obj/LionFish/LionFish.obj", scale=0.1, index=0)
-    pos = {"scaling": (2, 2, 2),
-           "rotation_axis": (0, 1, 0),
-           "rotation_angle": -45
-          }
+    boids = Boids(color_shader, 8, "obj/LionFish/LionFish.obj", scaling=0.1, index=0)
+    pos = {"scaling": (2, 2, 2)}
     
     scene.add(boids, place_boids=pos)
 
