@@ -427,8 +427,8 @@ class Boids:
                     # positioning and centering the cluster
                     self.positions.append(vec(i - (n-1) / 2, j - (n-1) / 2, k - (n-1) / 2))
 
-        self.velocities = [vec(2*i, 0, i) for _ in range(number)]
-        self.accelerations = [vec(0, 0, 0) for i in range(number)]
+        self.velocities = [vec(2*i, 3*i, i) for _ in range(number)]
+        self.accelerations = [vec(0, 0, i*1e-1) for i in range(number)]
         self.orientations = [velocity / np.linalg.norm(velocity) for velocity in self.velocities]     # to change the orientation of the boids
         self.max_speed = 5
 
@@ -439,48 +439,48 @@ class Boids:
             # To be able to rotate the boids in their own quad
             roots.append(Object(shader, "root_{}".format(i), position=self.positions[i], scaling=(scaling, scaling, scaling)))
 
-            # To set the correct orientation at the beginning
+            # Setting the correct orientation at the beginning
             axis = np.cross(vec(0, 0, 1), self.orientations[i])
             angle =  np.arccos(np.dot(vec(0, 0, 1), self.orientations[i])) * 360 / (2 * np.pi)
-            rotation_mat = rotate(self.orientations[i], -90) @ rotate(axis, angle) @ rotate(vec(0, 0, 1), 90)
+            rotation_mat = rotate(self.orientations[i], 180) @ rotate(axis, angle) @ rotate(vec(0, 0, 1), 180)
             roots[i].add(Object(shader, "boid_{}".format(i), model, rotation_mat=rotation_mat))
+
             # self.boids.append(Object(shader, "boid_{}".format(i), model, position=self.positions[i], scaling=(scale, scale, scale)))
             self.boids.append(roots[i])
 
         self.transforms = [boid.transform for boid in self.boids]
-        # self.velocities = [vec(2*i*1e-1, 3*i*1e-1, i*1e-1) for i in range(number)]
        
     def edges(self):
         """
         If the boids hit an edge of the box, its velocity along this axis is inverted and so is the acceleration
-        Petit souci dans la formule, probablement l'axe de rotation
-        Trouver la normal du plan et utiliser x -> x - 2*n*(n.x)
-        Visiblement la symétrie n'est pas réaliste ...
         """
         # For now, in a box of size 5, but otherwise the function is ok except for orientation
-        for boid, position, orientation, velocity, acceleration in zip(self.boids, self.positions, self.orientations, self.velocities, self.accelerations):
-            # copie indépendante ?
-            new_orientation = vec([orientation[i] for i in range(3)])
+        # Sometimes the up vector is not preserved
+        indices = [i for i in range(self.number)]
+        for index, boid, position, orientation, velocity, acceleration in zip(indices, self.boids, self.positions, self.orientations, self.velocities, self.accelerations):
+            new_orientation = copy.deepcopy(orientation)
             changed = False
             for i in range(3):
-                if (position[i] > 5 and velocity[i] > 0) or (position[i] < -5 and velocity[i] < 0):
+                if (position[i] > 3 and velocity[i] > 0) or (position[i] < -3 and velocity[i] < 0):
                     velocity[i] = -velocity[i]
                     acceleration[i] = -acceleration[i]
-                    # peut-etre deux coordonnees a changer ? cf. matrices de réflexion
                     new_orientation[i] = -orientation[i]
                     changed = True 
+                    
             # Changing the orientation of the objects
             if changed:
                 # Rotation in the boid's ref and not in the common one
                 axis = np.cross(orientation, new_orientation)
                 # Angle changend from radians to degrees
                 angle = np.arccos(np.dot(orientation, new_orientation)) * 360 / (2 * np.pi)
-                # Rotations of 90 degrees to preserve the up vector of the boid cf. schema
+                # Rotations of 180 degrees to preserve the up vector of the boid cf. schema
+                rotation_mat = rotate(new_orientation, 180) @ rotate(axis, angle) @ rotate(orientation, 180)
 
-                rotation_mat = rotate(new_orientation, -90) @ rotate(axis, angle) @ rotate(orientation, 90)
                 for child in boid.node.children.values():
                     child.transform = rotation_mat @ child.transform
-            orientation = vec([new_orientation[i] for i in range(3)])
+
+            # Updating the orientations
+            self.orientations[index] = copy.deepcopy(new_orientation)
 
 
     def orient(self):
@@ -491,7 +491,7 @@ class Boids:
     def tests(self, time):
         self.edges()
         deltat = 1e-3
-        if int(time % 25) == 0:
+        if int(time % 35) == 0:
             for boid, transform in zip(self.boids, self.transforms):
                 # seules les transformations de départ sont conservées, mais pas l'orientation ! à gérer
                 boid.transform = transform
@@ -511,5 +511,4 @@ class Boids:
         self.tests(glfw.get_time())
         # self.update_positions(glfw.get_time())
         for boid in self.boids:
-            # chelou mais ça marche
             boid.draw(projection, view, model @ boid.transform)
