@@ -410,6 +410,7 @@ class Boids:
     """
     Testing phase
     """
+    # En ajoutant les contraintes, l'orientation déconne
     def __init__(self, shader, number, model, scaling, index):
         """
         For now, number has to be a perfect cube
@@ -418,6 +419,10 @@ class Boids:
         self.number = number
         self.positions = []
         self.boids = []
+        self.perception = 2
+        self.deltat = 1e-1
+        self.max_speed = 4
+        self.max_force = 3
 
         n = round(number ** (1./3))
 
@@ -425,12 +430,17 @@ class Boids:
             for j in range(n):
                 for k in range(n):
                     # positioning and centering the cluster
-                    self.positions.append(vec(i - (n-1) / 2, j - (n-1) / 2, k - (n-1) / 2))
+                    self.positions.append(3 * vec(i - (n-1) / 2, j - (n-1) / 2, k - (n-1) / 2))
 
-        self.velocities = [vec(2*i, 3*i, i) for _ in range(number)]
-        self.accelerations = [vec(0, 0, i*1e-1) for i in range(number)]
+        self.velocities = [vec(random.uniform(0, np.sqrt(3*self.max_speed**2)),
+                               random.uniform(0, np.sqrt(3*self.max_speed**2)),
+                               random.uniform(0, np.sqrt(3*self.max_speed**2))) for _ in range(number)]
+        self.accelerations = [vec(random.uniform(0, np.sqrt(3*self.max_force**2)),
+                                  random.uniform(0, np.sqrt(3*self.max_force**2)),
+                                  random.uniform(0, np.sqrt(3*self.max_force**2))) for _ in range(number)]
+
         self.orientations = [velocity / np.linalg.norm(velocity) for velocity in self.velocities]     # to change the orientation of the boids
-        self.max_speed = 5
+
 
         roots = []
         for i in range(number):
@@ -448,7 +458,7 @@ class Boids:
             # self.boids.append(Object(shader, "boid_{}".format(i), model, position=self.positions[i], scaling=(scale, scale, scale)))
             self.boids.append(roots[i])
 
-        self.transforms = [boid.transform for boid in self.boids]
+        # self.transforms = [boid.transform for boid in self.boids]
        
     def edges(self):
         """
@@ -461,7 +471,7 @@ class Boids:
             new_orientation = copy.deepcopy(orientation)
             changed = False
             for i in range(3):
-                if (position[i] > 3 and velocity[i] > 0) or (position[i] < -3 and velocity[i] < 0):
+                if (position[i] > 10 and velocity[i] > 0) or (position[i] < -10 and velocity[i] < 0):
                     velocity[i] = -velocity[i]
                     acceleration[i] = -acceleration[i]
                     new_orientation[i] = -orientation[i]
@@ -474,6 +484,7 @@ class Boids:
                 # Angle changend from radians to degrees
                 angle = np.arccos(np.dot(orientation, new_orientation)) * 360 / (2 * np.pi)
                 # Rotations of 180 degrees to preserve the up vector of the boid cf. schema
+                # Bug, il faudrait considérer le up vector (0, 1, 0) d'une certaine manière
                 rotation_mat = rotate(new_orientation, 180) @ rotate(axis, angle) @ rotate(orientation, 180)
 
                 for child in boid.node.children.values():
@@ -482,33 +493,88 @@ class Boids:
             # Updating the orientations
             self.orientations[index] = copy.deepcopy(new_orientation)
 
+    def align(self):
+        """
+        Alignement of the orientation of a boid
+        """
+        for index in range(self.number):
+            steering = vec(0, 0, 0)
+            avg = vec(0, 0, 0)
+            total = 0
+            for other_index in range(self.number):
+                if index != other_index and np.linalg.norm(self.positions[index] - self.positions[other_index]) < self.perception:
+                    avg += self.velocities[other_index]
+                    total += 1
+            if total > 0:
+                avg /= total
+                avg = avg / np.linalg.norm(avg) * self.max_speed
+                steering = avg - self.velocities[index]
+                self.accelerations[index] += steering
 
-    def orient(self):
-        for boid, orientation in zip(self.boids, self.orientations):
-            pass
-            # boid.transform = rotate() @ boid.transform
+    def cohesion(self):
+        """
+        Cohesion rule
+        """
+        for index in range(self.number):
+            steering = vec(0, 0, 0)
+            center_of_mass = vec(0, 0, 0)
+            total = 0
+            for other_index in range(self.number):
+                if index != other_index and np.linalg.norm(self.positions[index] - self.positions[other_index]) < self.perception:
+                    center_of_mass += self.positions[other_index]
+                    total += 1
+            if total > 0:
+                center_of_mass /= total
+                vec_to_com = center_of_mass - self.positions[index]
+                if np.linalg.norm(vec_to_com) > 0:
+                    vec_to_com = (vec_to_com / np.linalg.norm(vec_to_com)) * self.max_speed
+                steering = vec_to_com - self.velocities[index]
+                if np.linalg.norm(steering) > self.max_force:
+                    steering = (steering /np.linalg.norm(steering)) * self.max_force
+                self.accelerations[index] += self.deltat * steering
 
-    def tests(self, time):
+    def separate(self):
+        """
+        Separation rule
+        """
+        for index in range(self.number):
+            steering = vec(0, 0, 0)
+            avg = vec(0, 0, 0)
+            total = 0
+            for other_index in range(self.number):
+                if index != other_index:
+                    distance = np.linalg.norm(self.positions[other_index] - self.positions[index])
+                    if distance < self.perception:
+                        diff = self.positions[index] - self.positions[other_index]
+                        diff /= distance
+                        avg += diff
+                        total += 1
+            if total > 0:
+                avg /= total
+                # inutile ...
+                if np.linalg.norm(steering) > 0:
+                    avg = avg / np.linalg.norm(steering) * self.max_speed
+                steering = avg - self.velocities[index]
+                if np.linalg.norm(steering) > self.max_force:
+                    steering = steering / np.linalg.norm(steering) * self.max_force
+                self.accelerations[index] += self.deltat * steering
+
+    def update_positions(self):
         self.edges()
-        deltat = 1e-3
-        if int(time % 35) == 0:
-            for boid, transform in zip(self.boids, self.transforms):
-                # seules les transformations de départ sont conservées, mais pas l'orientation ! à gérer
-                boid.transform = transform
-        else:
-            for boid, position, velocity, acceleration in zip(self.boids, self.positions, self.velocities, self.accelerations):
-                boid.transform = translate(deltat*velocity) @ boid.transform
-                position += deltat * velocity
-                velocity += acceleration * deltat
-                # max speed
-                if np.linalg.norm(velocity) > self.max_speed:
-                    velocity /= np.linalg.norm(velocity) * self.max_speed
+        indices = [i for i in range(self.number)]
+        for index, boid, velocity, acceleration in zip(indices, self.boids, self.velocities, self.accelerations):
+            boid.transform = translate(self.deltat*velocity) @ boid.transform
+            self.positions[index] += self.deltat * velocity
+            velocity += acceleration * self.deltat
+            # max speed
+            if np.linalg.norm(velocity) > self.max_speed:
+                velocity /= np.linalg.norm(velocity) * self.max_speed
+            self.velocities[index] = velocity
 
-    def update_positions(self, time):
-        pass
-        
     def draw(self, projection, view, model):
-        self.tests(glfw.get_time())
-        # self.update_positions(glfw.get_time())
+        self.align()
+        self.cohesion()
+        self.separate()
+        self.update_positions()
         for boid in self.boids:
             boid.draw(projection, view, model @ boid.transform)
