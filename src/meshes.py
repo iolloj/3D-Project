@@ -66,8 +66,7 @@ class ComplexMesh(PhongMesh):
 
         super().__init__(shader, attributes, index, light_dir, k_a, k_d, k_s, s)
 
-        names = ['diffuse_map', 'light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position']
-        loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
+        loc = {'diffuse_map': GL.glGetUniformLocation(shader.glid, 'diffuse_map')}
         self.loc.update(loc)
 
         # interactive toggles
@@ -97,19 +96,6 @@ class ComplexMesh(PhongMesh):
         GL.glActiveTexture(GL.GL_TEXTURE0)
         GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture.glid)
         GL.glUniform1i(self.loc['diffuse_map'], 0)
-
-        # setup light parameters
-        GL.glUniform3fv(self.loc['light_dir'], 1, self.light_dir)
-
-        # setup material parameters
-        GL.glUniform3fv(self.loc['k_a'], 1, self.k_a)
-        GL.glUniform3fv(self.loc['k_d'], 1, self.k_d)
-        GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
-        GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
-
-        # world camera position for Phong illumination specular component
-        w_camera_position = np.linalg.inv(view)[:,3]
-        GL.glUniform3fv(self.loc['w_camera_position'], 1, w_camera_position)
 
         super().draw(projection, view, model, primitives)
 
