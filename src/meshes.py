@@ -57,16 +57,14 @@ class PhongMesh(Mesh):
 
 
 
-class ComplexMesh(Mesh):
+class ComplexMesh(PhongMesh):
     """ Simple first textured object """
 
     def __init__(self, shader, texture, attributes, index=None,
                  light_dir=(0, 0, 0),  # directional light (in world coords)
                  k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(1, 1, 1), s=16):
 
-        super().__init__(shader, attributes, index)
-        self.light_dir = light_dir
-        self.k_a, self.k_d, self.k_s, self.s = k_a, k_d, k_s, s
+        super().__init__(shader, attributes, index, light_dir, k_a, k_d, k_s, s)
 
         names = ['diffuse_map', 'light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position']
         loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
