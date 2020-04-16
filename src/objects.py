@@ -589,7 +589,7 @@ class Skybox(Mesh):
         self.textures = []
 
         for texture in texture_paths:
-            self.textures.append(np.asarray(Image.open(texture).resize((512, 512)).convert('RGBA')))
+            self.textures.append(np.asarray(Image.open(texture).resize((1024, 1024)).convert('RGBA')))
 
         # Loading the cube map
         self.cube_map_id = GL.glGenTextures(1)
@@ -597,7 +597,7 @@ class Skybox(Mesh):
         GL.glBindTexture(GL.GL_TEXTURE_CUBE_MAP, self.cube_map_id)
         for index, texture in enumerate(self.textures):
             # Right, Left, Top, Bottom, Back, Front faces
-            GL.glTexImage2D(GL.GL_TEXTURE_CUBE_MAP_POSITIVE_X+index, 0, GL.GL_RGBA, 512, 512, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture)
+            GL.glTexImage2D(GL.GL_TEXTURE_CUBE_MAP_POSITIVE_X+index, 0, GL.GL_RGBA, 1024, 1024, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture)
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_WRAP_R, GL.GL_CLAMP_TO_EDGE)
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)

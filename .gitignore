@@ -40,3 +40,6 @@ src/__pycache__/meshes.cpython-36.pyc
 src/__pycache__/nodes.cpython-36.pyc
 src/__pycache__/viewer.cpython-36.pyc
 src/__pycache__/transform.cpython-36.pyc
+
+# Zip files
+*.zip

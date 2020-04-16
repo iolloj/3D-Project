@@ -326,15 +326,11 @@ class Viewer(Node):
             # draw our scene objects
             self.draw(projection, view, identity())
 
-            #####
-            # à voir si besoin
-            # GL.glDisable(GL.GL_DEPTH_TEST)
+            # eliminating translations in the view matrix
             view_copy = copy.deepcopy(view)
             for i in range(3):
                 view_copy[i,3] = 0
             self.draw_skybox(projection, view_copy, identity())
-            # GL.glEnable(GL.GL_DEPTH_TEST)
-            #####
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)
