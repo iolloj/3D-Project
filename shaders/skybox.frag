@@ -3,7 +3,6 @@
 in vec3 textureCoords;
 out vec4 out_Color;
 
-// Vérifier qu'on le passe bien
 uniform samplerCube cubeMap;
 
 

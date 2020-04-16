@@ -583,7 +583,7 @@ class Boids:
 
 
 class Skybox(Mesh):
-    """ Loading and drawing a skybox """
+    """ Loading and drawing a skybox, to draw at the end of the scene """
     def __init__(self, shader, *texture_paths):
         assert len(texture_paths) == 6, 'Wrong number of textures'
         self.textures = []
@@ -595,9 +595,11 @@ class Skybox(Mesh):
         self.cube_map_id = GL.glGenTextures(1)
         GL.glActiveTexture(GL.GL_TEXTURE0)
         GL.glBindTexture(GL.GL_TEXTURE_CUBE_MAP, self.cube_map_id)
+
         for index, texture in enumerate(self.textures):
-            # Right, Left, Top, Bottom, Back, Front faces
+            # Right, Left, Top, Bottom, Front, Back faces
             GL.glTexImage2D(GL.GL_TEXTURE_CUBE_MAP_POSITIVE_X+index, 0, GL.GL_RGBA, 1024, 1024, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture)
+        
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP_TO_EDGE)
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_WRAP_R, GL.GL_CLAMP_TO_EDGE)
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP_TO_EDGE)
@@ -605,49 +607,14 @@ class Skybox(Mesh):
         GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
 
         # Setting the vertices
-        SIZE = 50000
         position = np.array((
-            (-SIZE,  SIZE, -SIZE),
-	        (-SIZE, -SIZE, -SIZE),
-	        (SIZE, -SIZE, -SIZE),
-	        (SIZE, -SIZE, -SIZE),
-	        (SIZE,  SIZE, -SIZE),
-	        (-SIZE,  SIZE, -SIZE),
-
-	        (-SIZE, -SIZE,  SIZE),
-	        (-SIZE, -SIZE, -SIZE),
-	        (-SIZE,  SIZE, -SIZE),
-	        (-SIZE,  SIZE, -SIZE),
-	        (-SIZE,  SIZE,  SIZE),
-	        (-SIZE, -SIZE,  SIZE),
-
-	        (SIZE, -SIZE, -SIZE),
-	        (SIZE, -SIZE,  SIZE),
-	        (SIZE,  SIZE,  SIZE),
-	        (SIZE,  SIZE,  SIZE),
-	        (SIZE,  SIZE, -SIZE),
-	        (SIZE, -SIZE, -SIZE),
-
-	        (-SIZE, -SIZE,  SIZE),
-	        (-SIZE,  SIZE,  SIZE),
-	        (SIZE,  SIZE,  SIZE),
-	        (SIZE,  SIZE,  SIZE),
-	        (SIZE, -SIZE,  SIZE),
-	        (-SIZE, -SIZE,  SIZE),
-
-	        (-SIZE,  SIZE, -SIZE),
-	        (SIZE,  SIZE, -SIZE),
-	        (SIZE,  SIZE,  SIZE),
-	        (SIZE,  SIZE,  SIZE),
-	        (-SIZE,  SIZE,  SIZE),
-	        (-SIZE,  SIZE, -SIZE),
-
-	        (-SIZE, -SIZE, -SIZE),
-	        (-SIZE, -SIZE,  SIZE),
-	        (SIZE, -SIZE, -SIZE),
-	        (SIZE, -SIZE, -SIZE),
-	        (-SIZE, -SIZE,  SIZE),
-	        (SIZE, -SIZE,  SIZE)), np.float32)
+            (-1,  1, -1), (-1, -1, -1), (1, -1, -1), (1, -1, -1), (1,  1, -1), (-1,  1, -1),
+	        (-1, -1,  1), (-1, -1, -1), (-1,  1, -1), (-1,  1, -1), (-1,  1,  1), (-1, -1,  1),
+	        (1, -1, -1), (1, -1,  1), (1,  1,  1), (1,  1,  1), (1,  1, -1), (1, -1, -1),
+            (-1, -1,  1), (-1,  1,  1), (1,  1,  1), (1,  1,  1), (1, -1,  1), (-1, -1,  1),
+	        (-1,  1, -1), (1,  1, -1), (1,  1,  1), (1,  1,  1), (-1,  1,  1), (-1,  1, -1),
+	        (-1, -1, -1), (-1, -1,  1), (1, -1, -1), (1, -1, -1), (-1, -1,  1), (1, -1,  1)
+        ), np.float32)
         
         super().__init__(shader, [position])
 

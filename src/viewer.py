@@ -327,10 +327,14 @@ class Viewer(Node):
             self.draw(projection, view, identity())
 
             # eliminating translations in the view matrix
+            # skybox of size 1 cf. vertex shader
+            GL.glDepthFunc(GL.GL_LEQUAL)
             view_copy = copy.deepcopy(view)
             for i in range(3):
                 view_copy[i,3] = 0
             self.draw_skybox(projection, view_copy, identity())
+            # back to the initial depth function
+            GL.glDepthFunc(GL.GL_LESS)
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)

@@ -3,13 +3,14 @@
 in vec3 position;
 out vec3 textureCoords;
 
-// Vérifier dans le code qu'on les passe bien
 uniform mat4 projection;
 uniform mat4 view;
 
 
 void main()
 {
-    gl_Position = projection * view * vec4(position, 1);
+    vec4 pos = projection * view * vec4(position, 1);
+    // Normalization
+    gl_Position = pos.xyww;
     textureCoords = position;
 }
