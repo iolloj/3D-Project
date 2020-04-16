@@ -14,6 +14,7 @@ import OpenGL.GL as GL              # standard Python OpenGL wrapper
 import glfw                         # lean window system wrapper for OpenGL
 import numpy as np                  # all matrix manipulations & OpenGL args
 import assimpcy                     # 3D resource loader
+import copy
 
 from transform import *
 
@@ -134,6 +135,7 @@ class Node:
         """ Using a dictionary to store the name, by default a number """
         self.transform = transform
         self.children = {}
+        self.skybox = None
         for key, value in enumerate(list(iter(children))):
             self.children[key] = value
 
@@ -143,10 +145,19 @@ class Node:
         tmp_dict = {drawable[0]: drawable[1] for drawable in drawables}
         self.children.update(tmp_dict)
 
+    def add_skybox(self, skybox):
+        """ Add a skybox """
+        self.skybox = skybox
+
     def draw(self, projection, view, model):
         """ Recursive draw, passing down updated model matrix. """
         for child in self.children.values():
             child.draw(projection, view, model @ self.transform)
+
+    def draw_skybox(self, projection, view, model):
+        """ Y en a-t-il besoin ? """
+        if self.skybox is not None:
+            self.skybox.draw(projection, view, model)
 
     def key_handler(self, key):
         """ Dispatch keyboard events to children """
@@ -314,6 +325,16 @@ class Viewer(Node):
 
             # draw our scene objects
             self.draw(projection, view, identity())
+
+            #####
+            # à voir si besoin
+            # GL.glDisable(GL.GL_DEPTH_TEST)
+            view_copy = copy.deepcopy(view)
+            for i in range(3):
+                view_copy[i,3] = 0
+            self.draw_skybox(projection, view_copy, identity())
+            # GL.glEnable(GL.GL_DEPTH_TEST)
+            #####
 
             # flush render commands, and swap draw buffers
             glfw.swap_buffers(self.win)

@@ -19,7 +19,9 @@ class Scene:
         """ Maybe add rotations in the viewer initialisation """
         self.viewer = Viewer(distance = camera_dist)
         self.shaders = {'color': Shader(shaders_dir+"color.vert", shaders_dir+"color.frag"),
-                        'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag")}
+                        'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag"),
+                        'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag")
+                       }
         self.node = Node()
         self.viewer.add(("root", self.node))
         self.light_dir = light_dir
@@ -578,3 +580,73 @@ class Boids:
         self.update_positions()
         for boid in self.boids:
             boid.draw(projection, view, model @ boid.transform)
+
+
+class Skybox(Mesh):
+    """ Loading and drawing a skybox """
+    def __init__(self, shader, *texture_paths):
+        assert len(texture_paths) == 6, 'Wrong number of textures'
+        self.textures = []
+
+        for texture in texture_paths:
+            self.textures.append(np.asarray(Image.open(texture).resize((512, 512)).convert('RGBA')))
+
+        # Loading the cube map
+        self.cube_map_id = GL.glGenTextures(1)
+        GL.glActiveTexture(GL.GL_TEXTURE0)
+        GL.glBindTexture(GL.GL_TEXTURE_CUBE_MAP, self.cube_map_id)
+        for index, texture in enumerate(self.textures):
+            # Right, Left, Top, Bottom, Back, Front faces
+            GL.glTexImage2D(GL.GL_TEXTURE_CUBE_MAP_POSITIVE_X+index, 0, GL.GL_RGBA, 512, 512, 0, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, texture)
+        GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR)
+        GL.glTexParameteri(GL.GL_TEXTURE_CUBE_MAP, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR)
+
+        # Setting the vertices
+        SIZE = 50000
+        position = np.array((
+            (-SIZE,  SIZE, -SIZE),
+	        (-SIZE, -SIZE, -SIZE),
+	        (SIZE, -SIZE, -SIZE),
+	        (SIZE, -SIZE, -SIZE),
+	        (SIZE,  SIZE, -SIZE),
+	        (-SIZE,  SIZE, -SIZE),
+
+	        (-SIZE, -SIZE,  SIZE),
+	        (-SIZE, -SIZE, -SIZE),
+	        (-SIZE,  SIZE, -SIZE),
+	        (-SIZE,  SIZE, -SIZE),
+	        (-SIZE,  SIZE,  SIZE),
+	        (-SIZE, -SIZE,  SIZE),
+
+	        (SIZE, -SIZE, -SIZE),
+	        (SIZE, -SIZE,  SIZE),
+	        (SIZE,  SIZE,  SIZE),
+	        (SIZE,  SIZE,  SIZE),
+	        (SIZE,  SIZE, -SIZE),
+	        (SIZE, -SIZE, -SIZE),
+
+	        (-SIZE, -SIZE,  SIZE),
+	        (-SIZE,  SIZE,  SIZE),
+	        (SIZE,  SIZE,  SIZE),
+	        (SIZE,  SIZE,  SIZE),
+	        (SIZE, -SIZE,  SIZE),
+	        (-SIZE, -SIZE,  SIZE),
+
+	        (-SIZE,  SIZE, -SIZE),
+	        (SIZE,  SIZE, -SIZE),
+	        (SIZE,  SIZE,  SIZE),
+	        (SIZE,  SIZE,  SIZE),
+	        (-SIZE,  SIZE,  SIZE),
+	        (-SIZE,  SIZE, -SIZE),
+
+	        (-SIZE, -SIZE, -SIZE),
+	        (-SIZE, -SIZE,  SIZE),
+	        (SIZE, -SIZE, -SIZE),
+	        (SIZE, -SIZE, -SIZE),
+	        (-SIZE, -SIZE,  SIZE),
+	        (SIZE, -SIZE,  SIZE)), np.float32)
+        
+        super().__init__(shader, [position])
+
+    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES):
+        super().draw(projection, view, model, primitives)

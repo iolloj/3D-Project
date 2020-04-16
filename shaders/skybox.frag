@@ -1,0 +1,13 @@
+#version 330 core
+
+in vec3 textureCoords;
+out vec4 out_Color;
+
+// Vérifier qu'on le passe bien
+uniform samplerCube cubeMap;
+
+
+void main()
+{
+    out_Color = texture(cubeMap, textureCoords);
+}
