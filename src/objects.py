@@ -7,6 +7,7 @@ peut-etre probleme lie aux normales
 
 import copy
 import random
+import time
 
 from src.viewer import *
 from src.meshes import *
@@ -20,17 +21,24 @@ class Scene:
         self.viewer = Viewer(distance = camera_dist)
         self.shaders = {'color': Shader(shaders_dir+"color.vert", shaders_dir+"color.frag"),
                         'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag"),
-                        'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag")
-                       }
+                        'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag"),
+                        'wave': Shader(shaders_dir+"waves.vert", shaders_dir+"waves.frag")}
         self.node = Node()
         self.viewer.add(("root", self.node))
         self.light_dir = light_dir
         self.terrain = None
+        self.water = None
 
     def generate_terrain(self, texture, height, max_height, size):
         self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, size=size,
                                light_dir=self.light_dir)
         self.viewer.add(("terrain", self.terrain))
+
+    def generate_water(self, texture, size):
+        self.water = Water(texture, self.shaders['wave'], size=size,
+                               light_dir=self.light_dir)
+        self.viewer.add(("water", self.water)) 
+
 
     def add(self, *objects, **animation):
         """
@@ -259,7 +267,7 @@ class Surface(Mesh):
             self.filter_mode = next(self.filter)
             self.texture = Texture(self.texture_map, self.wrap_mode, *self.filter_mode)
 
-    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES):
+    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES, time=None):
         """ vérifier pour diffuse_map ? """
         GL.glUseProgram(self.shader.glid)
 
@@ -276,6 +284,9 @@ class Surface(Mesh):
         GL.glUniform3fv(self.loc['k_d'], 1, self.k_d)
         GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
         GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
+
+        if time != None:
+            GL.glUniform3fv(self.loc['time'], 1, time)
 
         # world camera position for Phong illumination specular component
         w_camera_position = np.linalg.inv(view)[:,3]
@@ -380,10 +391,57 @@ class TerrainAttributes(Attributes):
 
 
 class WaterAttributes(Attributes):
-    # TODO
-    # La texture utilisée peut être une image de couleur uniforme pour l'eau
-    def __init__(self):
-        pass
+    def __init__(self, texture_map, max_color, max_height, size):
+        super().__init__(texture_map, max_color, max_height, size)
+
+
+    def generate_attributes(self):
+        """
+        Generate the vertices, normals and indices to be
+        passed to the shader
+        """
+        # number of vertices along one axis
+        number_vertices_x = self.size
+        total_vertices = number_vertices_x**2
+        vertex_pointer = 0
+
+        # result containers
+        vertices = total_vertices * [0]
+        normals = total_vertices * [0]
+
+        # positions and normals computation
+        for i in range(number_vertices_x):
+            for j in range(number_vertices_x):
+                x = j / (number_vertices_x - 1) * self.size
+                y = 0
+                z = i / (number_vertices_x - 1) * self.size
+                normal = vec(0, 1, 0)
+
+                vertices[vertex_pointer] = (x, y, z)
+                normals[vertex_pointer] = normal
+                vertex_pointer += 1
+
+        # centering the plane on (0, 0, 0)
+        vertices -= vec(self.size / 2, 0, self.size / 2)
+
+        # number of indices in the index array
+        indices = (6 * (number_vertices_x - 1)**2) * [0]
+        indices_pointer = 0
+
+        # indices computation
+        for z in range(number_vertices_x-1):
+            for x in range(number_vertices_x-1):
+                top_left = z * number_vertices_x + x
+                top_right = top_left + 1
+                bottom_left = (z + 1) * number_vertices_x + x
+                bottom_right = bottom_left + 1
+
+                ind = [top_left, bottom_left, top_right, top_right, bottom_left, bottom_right]
+                for i in range(6):
+                    indices[indices_pointer] = ind[i]
+                    indices_pointer += 1
+
+        return vertices, normals, indices    
 
 
 class Terrain(Surface):
@@ -407,9 +465,48 @@ class Terrain(Surface):
 
 
 class Water(Surface):
-    # TODO
-    def __init__(self):
-        pass
+    def __init__(self, texture_map, shader, max_color = 256, max_height = 100, size = 50,
+                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
+        self.attrib = WaterAttributes(texture_map, max_color, max_height, size)
+        self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
+        self.begin = time.time()
+        self.size = size
+        super().__init__(texture_map, max_height, size, light_dir, k_a, k_d, k_s, s)
+        Mesh.__init__(self, shader=shader, attributes=[self.vertices, self.normals], index=self.indices)
+
+        names = ['diffuse_map', 'light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position', 'time']
+        loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
+        self.loc.update(loc)
+
+        print('Loaded terrain \t(x=[%s, %s], z=[%s, %s], %s faces)' % (-self.attrib.size/2, self.attrib.size/2,
+                                                                       -self.attrib.size/2, self.attrib.size/2,
+                                                                       (self.size**2) * 2))
+
+    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES):
+        """ vérifier pour diffuse_map ? """
+        GL.glUseProgram(self.shader.glid)
+
+        # texture access setups
+        GL.glActiveTexture(GL.GL_TEXTURE0)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture.glid)
+        GL.glUniform1i(self.loc['diffuse_map'], 0)
+
+        # setup light parameters
+        GL.glUniform3fv(self.loc['light_dir'], 1, self.light_dir)
+
+        # setup material parameters
+        GL.glUniform3fv(self.loc['k_a'], 1, self.k_a)
+        GL.glUniform3fv(self.loc['k_d'], 1, self.k_d)
+        GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
+        GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
+        timesup = time.time() - self.begin
+        GL.glUniform1f(self.loc['time'], timesup)
+
+        # world camera position for Phong illumination specular component
+        w_camera_position = np.linalg.inv(view)[:,3]
+        GL.glUniform3fv(self.loc['w_camera_position'], 1, w_camera_position)
+
+        super().draw(projection, view, model, primitives)
 
 
 class Boids:
