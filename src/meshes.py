@@ -26,7 +26,7 @@ class PhongMesh(Mesh):
 
     def __init__(self, shader, attributes, index=None,
                  light_dir=(0, -1, 0),   # directionnal light (in world coords)
-                 k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(1, 1, 1), s=16.):
+                 k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(1, 1, 1), s=16):
         super().__init__(shader, attributes, index)
         self.light_dir = light_dir
         self.k_a, self.k_d, self.k_s, self.s = k_a, k_d, k_s, s

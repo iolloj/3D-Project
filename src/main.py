@@ -7,7 +7,7 @@ from meshes import *
 
 
 def main():
-    scene = Scene("../shaders/", light_dir=vec(0, 0, 1), camera_dist=100)
+    scene = Scene("../shaders/", light_dir=vec(1, 1, 1), camera_dist=100)
 
     color_shader = scene.shaders['color']
 

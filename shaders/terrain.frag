@@ -35,9 +35,11 @@ void main() {
     // Point P in camera space is the view vector
     vec3 v = normalize(pos);
     
-    vec4 ka = texture(diffuse_map, frag_tex_coords);
+    vec4 kd = texture(diffuse_map, frag_tex_coords);
 
     // Phong model + texture
-    // Add k_a?
-    out_color = ka + vec4(k_d * max(0, dot(n, l)) + k_s * pow(max(0, dot(r, v)), s), 1);
+    if (light_dir == vec3(0, 0, 0))
+        out_color = kd;
+    else
+        out_color = kd * max(0, dot(n, l)) + vec4(k_a + k_s * pow(max(0, dot(r, v)), s), 1);
 }

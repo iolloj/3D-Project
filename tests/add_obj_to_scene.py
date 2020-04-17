@@ -29,7 +29,7 @@ def main():
     # Objects creation
     suzanne = Object(color_shader, "suzanne", "obj/suzanne/suzanne.obj", light_dir=(0, 1, 1), position=(-1, 0, 0), rotation_axis=(0, 1, 0), rotation_angle=45)
     suzanne_uncolored = Object(color_shader, "suzanne_uncolored", "obj/suzanne/suzanne_uncolored.obj", light_dir=(1, 0, 0), position=(-1, 2, 0), scaling=(1, 0.5, 1))
-    cube = Object(color_shader, "cube", "obj/cube/cube.obj", position=(1, 0, 0), rotation_mat=rotation_matrix)
+    cube = Object(color_shader, "cube", "obj/cube/cube.obj", position=(1, 0, 0), rotation_mat=rotation_matrix, light_dir=(1, 0, 0))
     granit_cube = Object(color_shader, "granit_cube", "obj/cube/cube.obj", tex_file="img/granit.jpg")
 
     # Adding objects to the scene
