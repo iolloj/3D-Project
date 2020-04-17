@@ -8,8 +8,8 @@ def main():
 
     color_shader = scene.shaders['color']
 
-    scene.generate_water("img/blu.jpg", 100)
     scene.generate_terrain("img/sand.jpg", "img/height.jpg", 10, 100)
+    scene.generate_water("img/blue.jpg", 100)
 
     rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
     anim = {"rotation_control": True, "key_up": glfw.KEY_UP, "key_down": glfw.KEY_DOWN, "axis": (1, 0, 0)}
