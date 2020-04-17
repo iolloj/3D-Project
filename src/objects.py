@@ -107,6 +107,10 @@ class Scene:
                     else:
                         self.node.add((name, new_node))
 
+    def add_skybox(self, skybox):
+        """ Add a skybox """
+        self.viewer.add_skybox(skybox)
+
     def update_position(self, obj):
         """ The entry in the dictionary is replaced """
         obj.parent.add(obj, rotation_control=obj.rotation_control)

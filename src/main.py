@@ -58,7 +58,7 @@ def main():
     scene.update_position(cube2)
 
     skybox = Skybox(scene.shaders['skybox'], "../img/skybox/right.png", "../img/skybox/left.png", "../img/skybox/top.png", "../img/skybox/bottom.png", "../img/skybox/front.png", "../img/skybox/back.png")
-    scene.viewer.add_skybox(skybox)
+    scene.add_skybox(skybox)
 
     scene.viewer.run()
 
