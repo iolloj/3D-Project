@@ -5,12 +5,9 @@ Test keyboard control and keyframe animation
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '../src/')
+sys.path.insert(1, '../')
 
-from viewer import *
-from objects import *
-from nodes import *
-from meshes import *
+from src import *
 
 
 def main():
@@ -39,8 +36,8 @@ def main():
                     }
 
     # Objects creation
-    granit_cube = Object(color_shader, "granit_cube", "obj/cube/cube.obj", tex_file="img/granit.jpg")
-    cube = Object(color_shader, "cube", "obj/cube/cube.obj", position=(0, 0.85, 0), scaling=(0.7, 0.7, 0.7))
+    granit_cube = Object(color_shader, "granit_cube", "../obj/others/cube/cube.obj", tex_file="../img/granit.jpg")
+    cube = Object(color_shader, "cube", "../obj/others/cube/cube.obj", position=(0, 0.85, 0), scaling=(0.7, 0.7, 0.7))
 
     # Adding children
     granit_cube.add(cube, keyframes=keyframe_anim, rotation_control=y_rotation)

@@ -5,12 +5,9 @@ Test boids model
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '../src/')
+sys.path.insert(1, '../')
 
-from viewer import *
-from objects import *
-from nodes import *
-from meshes import *
+from src import *
 
 
 def main():
@@ -21,7 +18,7 @@ def main():
     color_shader = scene.shaders['color']
 
     # Boids
-    boids = Boids(color_shader, 27, "obj/LionFish/LionFish.obj", scaling=0.1, index=0)
+    boids = Boids(color_shader, 27, "../obj/Fish/LionFish/LionFish.obj", scaling=0.1, index=0)
     
     scene.add(boids)
 

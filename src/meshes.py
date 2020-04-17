@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from viewer import *
+from src.viewer import *
 
 # mesh to refactor all previous classes
 class Mesh:

@@ -8,9 +8,9 @@ peut-etre probleme lie aux normales
 import copy
 import random
 
-from viewer import *
-from meshes import *
-from nodes import *
+from src.viewer import *
+from src.meshes import *
+from src.nodes import *
 
 
 class Scene:

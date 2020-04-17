@@ -5,12 +5,9 @@ Test children adding
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '../src/')
+sys.path.insert(1, '../')
 
-from viewer import *
-from objects import *
-from nodes import *
-from meshes import *
+from src import *
 
 
 # Maye check that the illumination is propagated to the children
@@ -27,12 +24,12 @@ def main():
     color_shader = scene.shaders['color']
 
     # Creating root object
-    root = Object(color_shader, "root", "obj/cube/cube.obj", tex_file="img/granit.jpg")
+    root = Object(color_shader, "root", "../obj/others/cube/cube.obj", tex_file="../img/granit.jpg")
 
     # Creating children
-    cube = Object(color_shader, "cube", "obj/cube/cube.obj", position=(0, 0.85, 0), scaling=(0.7, 0.7, 0.7))
-    bunny1 = Object(color_shader, "bunny1", "obj/bunny/bunny.obj", position=(-0.3, 0.76, 0), scaling=(0.5, 0.5, 0.5), rotation_axis=(0, 1, 0), rotation_angle=45)
-    bunny2 = Object(color_shader, "bunny2", "obj/bunny/bunny.obj", position=(0.3, 0.76, 0), scaling=(0.5, 0.5, 0.5), rotation_axis=(0, 1, 0), rotation_angle=45)
+    cube = Object(color_shader, "cube", "../obj/others/cube/cube.obj", position=(0, 0.85, 0), scaling=(0.7, 0.7, 0.7))
+    bunny1 = Object(color_shader, "bunny1", "../obj/others/bunny/bunny.obj", position=(-0.3, 0.76, 0), scaling=(0.5, 0.5, 0.5), rotation_axis=(0, 1, 0), rotation_angle=45)
+    bunny2 = Object(color_shader, "bunny2", "../obj/others/bunny/bunny.obj", position=(0.3, 0.76, 0), scaling=(0.5, 0.5, 0.5), rotation_axis=(0, 1, 0), rotation_angle=45)
 
     # Adding children to their parents
     root.add(cube)

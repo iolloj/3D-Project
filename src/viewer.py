@@ -16,7 +16,7 @@ import numpy as np                  # all matrix manipulations & OpenGL args
 import assimpcy                     # 3D resource loader
 import copy
 
-from transform import *
+from src.transform import *
 
 # ------------ low level OpenGL object wrappers ----------------------------
 class Shader:

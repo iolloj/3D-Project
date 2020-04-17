@@ -5,12 +5,9 @@ Test skybox creation
 
 import sys
 # insert at 1, 0 is the script path (or '' in REPL)
-sys.path.insert(1, '../src/')
+sys.path.insert(1, '../')
 
-from viewer import *
-from objects import *
-from nodes import *
-from meshes import *
+from src import *
 
 
 def main():
@@ -18,7 +15,7 @@ def main():
     scene = Scene("../shaders/", light_dir=(1, 1, 1), camera_dist=3000)
 
     skybox = Skybox(scene.shaders['skybox'], "../img/skybox/right.png", "../img/skybox/left.png", "../img/skybox/top.png", "../img/skybox/bottom.png", "../img/skybox/front.png", "../img/skybox/back.png")
-    scene.generate_terrain("img/sand.jpg", "img/perlin_noise.png", 2000, 10000)
+    scene.generate_terrain("../img/sand.jpg", "../img/perlin_noise.png", 2000, 10000)
 
     scene.add_skybox(skybox)
     
