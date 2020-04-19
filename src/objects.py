@@ -29,9 +29,9 @@ class Scene:
         self.terrain = None
         self.water = None
 
-    def generate_terrain(self, texture, height, max_height, size):
-        self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, size=size,
-                               light_dir=self.light_dir)
+    def generate_terrain(self, texture, height, max_height, size, translation=0):
+        self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, translation=translation,
+                               size=size, light_dir=self.light_dir)
         self.viewer.add(("terrain", self.terrain))
 
     def generate_water(self, texture, size):
@@ -306,8 +306,9 @@ class Attributes:
 
 
 class TerrainAttributes(Attributes):
-    def __init__(self, texture_map, height_map, max_color, max_height, size):
+    def __init__(self, texture_map, height_map, translation, max_color, max_height, size):
         super().__init__(texture_map, max_color, max_height, size)
+        self.translation = translation
         height = Image.open(height_map).convert('L')
         # crop to a square height_map
         self.height_map = height.crop((0, 0, min(height.size), min(height.size)))
@@ -359,7 +360,7 @@ class TerrainAttributes(Attributes):
         for i in range(number_vertices_x):
             for j in range(number_vertices_x):
                 x = j / (number_vertices_x - 1) * self.size
-                y = self.get_height(j, i)
+                y = self.get_height(j, i) + self.translation
                 z = i / (number_vertices_x - 1) * self.size
                 normal = self.compute_normal(j, i)
 
@@ -447,9 +448,9 @@ class WaterAttributes(Attributes):
 class Terrain(Surface):
     """ Simple first textured object """
     # Ajouter assertion si fichiers non trouvés
-    def __init__(self, texture_map, height_map, shader, max_color = 256, max_height = 10, size = 50,
+    def __init__(self, texture_map, height_map, shader, translation = 0, max_color = 256, max_height = 10, size = 50,
                  light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
-        self.attrib = TerrainAttributes(texture_map, height_map, max_color, max_height, size)
+        self.attrib = TerrainAttributes(texture_map, height_map, translation, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
 
         super().__init__(texture_map, max_height, size, light_dir, k_a, k_d, k_s, s)
