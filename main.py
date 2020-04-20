@@ -4,19 +4,27 @@ from src import *
 
 
 def main():
-    scene = Scene("shaders/", light_dir=vec(1, 1, 1), camera_dist=100)
+    scene = Scene("shaders/", light_dir=vec(1, 1, 1), camera_dist=230)
 
     color_shader = scene.shaders['color']
 
-    scene.generate_terrain("img/sand.jpg", "img/height.jpg", 10, 100)
-    scene.generate_water("img/blue.jpg", 100)
+    scene.generate_terrain("img/sand.jpg", "img/perlin_noise.png", 200, 1000, -10)
+    scene.generate_water("img/blue.jpg", 1000)
+
+    boids = Boids(color_shader, 27, "obj/Fish/BlueTang/BlueTang.obj", scaling=0.1, index=0)
+    boids_placement = {
+        "position": (0, -10, 200)
+    }
+    scene.add(boids, place_boids=boids_placement)
 
     rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
     anim = {"rotation_control": True, "key_up": glfw.KEY_UP, "key_down": glfw.KEY_DOWN, "axis": (1, 0, 0)}
-    keyframe_anim = {"keyframes": True,
-                    "translate_keys": {5: vec(0, 0, 0), 8: vec(1, 1, 0), 15: vec(0, 0, 0)},
-                    "rotate_keys": {5: quaternion(), 8: quaternion_from_euler(180, 45, 90), 10: quaternion_from_euler(180, 0, 180), 15: quaternion()},
-                    "scale_keys": {5: 1, 8: 0.5, 15: 1}}
+    keyframe_anim = {
+        "keyframes": True,
+        "translate_keys": {5: vec(0, 0, 0), 8: vec(1, 1, 0), 15: vec(0, 0, 0)},
+        "rotate_keys": {5: quaternion(), 8: quaternion_from_euler(180, 45, 90), 10: quaternion_from_euler(180, 0, 180), 15: quaternion()},
+        "scale_keys": {5: 1, 8: 0.5, 15: 1}
+    }
 
     cube1 = Object(color_shader, "cube1", "obj/others/cube/cube.obj", position=(0, 5, 0), rotation_mat=rotation_matrix, scaling=(0.5, 0.3, 0.7))
     cube2 = Object(color_shader, "cube2", 'obj/others/cube/cube.obj', position=(-5, 5, 3), scaling=(2, 2, 2), tex_file="obj/others/column/granit.jpg")

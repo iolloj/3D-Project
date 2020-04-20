@@ -29,9 +29,9 @@ class Scene:
         self.terrain = None
         self.water = None
 
-    def generate_terrain(self, texture, height, max_height, size):
-        self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, size=size,
-                               light_dir=self.light_dir)
+    def generate_terrain(self, texture, height, max_height, size, translation=0):
+        self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, translation=translation,
+                               size=size, light_dir=self.light_dir)
         self.viewer.add(("terrain", self.terrain))
 
     def generate_water(self, texture, size):
@@ -306,8 +306,9 @@ class Attributes:
 
 
 class TerrainAttributes(Attributes):
-    def __init__(self, texture_map, height_map, max_color, max_height, size):
+    def __init__(self, texture_map, height_map, translation, max_color, max_height, size):
         super().__init__(texture_map, max_color, max_height, size)
+        self.translation = translation
         height = Image.open(height_map).convert('L')
         # crop to a square height_map
         self.height_map = height.crop((0, 0, min(height.size), min(height.size)))
@@ -359,7 +360,7 @@ class TerrainAttributes(Attributes):
         for i in range(number_vertices_x):
             for j in range(number_vertices_x):
                 x = j / (number_vertices_x - 1) * self.size
-                y = self.get_height(j, i)
+                y = self.get_height(j, i) + self.translation
                 z = i / (number_vertices_x - 1) * self.size
                 normal = self.compute_normal(j, i)
 
@@ -447,9 +448,9 @@ class WaterAttributes(Attributes):
 class Terrain(Surface):
     """ Simple first textured object """
     # Ajouter assertion si fichiers non trouvés
-    def __init__(self, texture_map, height_map, shader, max_color = 256, max_height = 10, size = 50,
+    def __init__(self, texture_map, height_map, shader, translation = 0, max_color = 256, max_height = 10, size = 50,
                  light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
-        self.attrib = TerrainAttributes(texture_map, height_map, max_color, max_height, size)
+        self.attrib = TerrainAttributes(texture_map, height_map, translation, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
 
         super().__init__(texture_map, max_height, size, light_dir, k_a, k_d, k_s, s)
@@ -524,8 +525,8 @@ class Boids:
         self.boids = []
         self.perception = 2
         self.deltat = 1e-1
-        self.max_speed = 4
-        self.max_force = 3
+        self.max_speed = 2
+        self.max_force = 5
 
         n = round(number ** (1./3))
 
@@ -534,7 +535,7 @@ class Boids:
                 for k in range(n):
                     # positioning and centering the cluster
                     self.positions.append(3 * vec(i - (n-1) / 2, j - (n-1) / 2, k - (n-1) / 2))
-
+                    
         self.velocities = [vec(random.uniform(0, np.sqrt(3*self.max_speed**2)),
                                random.uniform(0, np.sqrt(3*self.max_speed**2)),
                                random.uniform(0, np.sqrt(3*self.max_speed**2))) for _ in range(number)]
@@ -547,9 +548,9 @@ class Boids:
 
         roots = []
         for i in range(number):
-            # Open FBX files if they provide an on place movement
+            # Open FBX files if they provide a skeleton
 
-            # To be able to rotate the boids in their own quad
+            # To be able to rotate the boids in their own spatial system
             roots.append(Object(shader, "root_{}".format(i), position=self.positions[i], scaling=(scaling, scaling, scaling)))
 
             # Setting the correct orientation at the beginning
@@ -580,11 +581,11 @@ class Boids:
                     new_orientation[i] = -orientation[i]
                     changed = True 
                     
-            # Changing the orientation of the objects
+            # Changing the orientation of the objects if needed
             if changed:
                 # Rotation in the boid's ref and not in the common one
                 axis = np.cross(orientation, new_orientation)
-                # Angle changend from radians to degrees
+                # Angle changed from radians to degrees
                 angle = np.arccos(np.dot(orientation, new_orientation)) * 360 / (2 * np.pi)
                 # Rotations of 180 degrees to preserve the up vector of the boid cf. schema
                 # Bug, il faudrait considérer le up vector (0, 1, 0) d'une certaine manière
@@ -596,71 +597,73 @@ class Boids:
             # Updating the orientations
             self.orientations[index] = copy.deepcopy(new_orientation)
 
-    def align(self):
+    def alignement(self):
         """
         Alignement of the orientation of a boid
         """
         for index in range(self.number):
-            steering = vec(0, 0, 0)
-            avg = vec(0, 0, 0)
+            direction = vec(0, 0, 0)
+            average = vec(0, 0, 0)
             total = 0
             for other_index in range(self.number):
+                # if the boids are different and can perceive each other
                 if index != other_index and np.linalg.norm(self.positions[index] - self.positions[other_index]) < self.perception:
-                    avg += self.velocities[other_index]
+                    average += self.velocities[other_index]
                     total += 1
             if total > 0:
-                avg /= total
-                avg = avg / np.linalg.norm(avg) * self.max_speed
-                steering = avg - self.velocities[index]
-                self.accelerations[index] += steering
+                average /= total
+                average = average / np.linalg.norm(average) * self.max_speed
+                direction = average - self.velocities[index]
+                self.accelerations[index] += direction
 
     def cohesion(self):
         """
         Cohesion rule
         """
         for index in range(self.number):
-            steering = vec(0, 0, 0)
+            direction = vec(0, 0, 0)
             center_of_mass = vec(0, 0, 0)
             total = 0
             for other_index in range(self.number):
+                # if the boids are different and can perceive each other
                 if index != other_index and np.linalg.norm(self.positions[index] - self.positions[other_index]) < self.perception:
                     center_of_mass += self.positions[other_index]
                     total += 1
             if total > 0:
                 center_of_mass /= total
-                vec_to_com = center_of_mass - self.positions[index]
-                if np.linalg.norm(vec_to_com) > 0:
-                    vec_to_com = (vec_to_com / np.linalg.norm(vec_to_com)) * self.max_speed
-                steering = vec_to_com - self.velocities[index]
-                if np.linalg.norm(steering) > self.max_force:
-                    steering = (steering /np.linalg.norm(steering)) * self.max_force
-                self.accelerations[index] += self.deltat * steering
+                vector_to_center = center_of_mass - self.positions[index]
+                if np.linalg.norm(vector_to_center) > 0:
+                    vector_to_center = vector_to_center / np.linalg.norm(vector_to_center) * self.max_speed
+                direction = vector_to_center - self.velocities[index]
+                # a maximal force intensity is imposed in the parameters and checked here
+                if np.linalg.norm(direction) > self.max_force:
+                    direction = direction /np.linalg.norm(direction) * self.max_force
+                self.accelerations[index] += self.deltat * direction
 
-    def separate(self):
+    def separation(self):
         """
         Separation rule
         """
         for index in range(self.number):
-            steering = vec(0, 0, 0)
-            avg = vec(0, 0, 0)
+            direction = vec(0, 0, 0)
+            average = vec(0, 0, 0)
             total = 0
             for other_index in range(self.number):
-                if index != other_index:
-                    distance = np.linalg.norm(self.positions[other_index] - self.positions[index])
-                    if distance < self.perception:
-                        diff = self.positions[index] - self.positions[other_index]
-                        diff /= distance
-                        avg += diff
-                        total += 1
+                distance = np.linalg.norm(self.positions[other_index] - self.positions[index])
+                # if the boids are different and perceive each other
+                if index != other_index and distance < self.perception:
+                    diff_vector = self.positions[index] - self.positions[other_index]
+                    # normalization
+                    diff_vector /= distance
+                    average += diff_vector
+                    total += 1
             if total > 0:
-                avg /= total
-                # inutile ...
-                if np.linalg.norm(steering) > 0:
-                    avg = avg / np.linalg.norm(steering) * self.max_speed
-                steering = avg - self.velocities[index]
-                if np.linalg.norm(steering) > self.max_force:
-                    steering = steering / np.linalg.norm(steering) * self.max_force
-                self.accelerations[index] += self.deltat * steering
+                average /= total
+                direction = average - self.velocities[index]
+                # a maximal force intensity is imposed in the parameters and checked here
+                if np.linalg.norm(direction) > self.max_force:
+                    direction = direction / np.linalg.norm(direction) * self.max_force
+                self.accelerations[index] += self.deltat * direction
 
     def update_positions(self):
         self.edges()
@@ -675,9 +678,9 @@ class Boids:
             self.velocities[index] = velocity
 
     def draw(self, projection, view, model):
-        self.align()
+        self.alignement()
         self.cohesion()
-        self.separate()
+        self.separation()
         self.update_positions()
         for boid in self.boids:
             boid.draw(projection, view, model @ boid.transform)
