@@ -19,10 +19,13 @@ class Scene:
     def __init__(self, shaders_dir, light_dir, camera_dist):
         """ Maybe add rotations in the viewer initialisation """
         self.viewer = Viewer(distance = camera_dist)
-        self.shaders = {'color': Shader(shaders_dir+"color.vert", shaders_dir+"color.frag"),
-                        'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag"),
-                        'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag"),
-                        'wave': Shader(shaders_dir+"waves.vert", shaders_dir+"waves.frag")}
+        self.shaders = {
+            'color': Shader(shaders_dir+"color.vert", shaders_dir+"color.frag"),
+            'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag"),
+            'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag"),
+            'wave': Shader(shaders_dir+"waves.vert", shaders_dir+"waves.frag"),
+            'skinning': Shader(shaders_dir+"skinning.vert", shaders_dir+"skinning.frag")
+        }
         self.node = Node()
         self.viewer.add(("root", self.node))
         self.light_dir = light_dir
