@@ -25,13 +25,14 @@ class Scene:
             'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag"),
             'wave': Shader(shaders_dir+"waves.vert", shaders_dir+"waves.frag"),
             'skinning': Shader(shaders_dir+"skinning.vert", shaders_dir+"skinning.frag"),
-            'test': Shader(shaders_dir+"test.vert", shaders_dir+"waves.frag")
+            'test': Shader(shaders_dir+"test.vert", shaders_dir+"color.frag")
         }
         self.node = Node()
         self.viewer.add(("root", self.node))
         self.light_dir = light_dir
         self.terrain = None
         self.water = None
+        self.begin = time.time()
 
     def generate_terrain(self, texture, height, max_height, size, translation=0):
         self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, translation=translation,
@@ -40,7 +41,7 @@ class Scene:
 
     def generate_water(self, texture, size):
         self.water = Water(texture, self.shaders['wave'], size=size,
-                               light_dir=self.light_dir)
+                               light_dir=self.light_dir, begin_time=self.begin)
         self.viewer.add(("water", self.water)) 
 
 
@@ -51,6 +52,9 @@ class Scene:
         """
         for obj in objects:
             # check if the arguments have valid names
+            if not isinstance(obj, Boids):
+                for mesh in obj.mesh:
+                    mesh.begin = self.begin
             try:
                 names = ["rotation_control", "keyframes", "place_boids"]
                 for key in animation.keys():
@@ -130,12 +134,15 @@ class Scene:
 
 class Object:
     """ Generic object """
-    def __init__(self, shader, name, obj_pos=None, light_dir=(0, 0, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None):
+    def __init__(self, shader, name, obj_pos=None, light_dir=(0, 0, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None, animated=False):
         # Maybe using **kwargs to pass a dictionary
         self.name = name
         self.parent = None
         if obj_pos is not None:
-            self.mesh = load(obj_pos, shader, light_dir, tex_file)
+            if animated:
+                self.mesh = load_skinned(obj_pos, shader, tex_file)
+            else:
+                self.mesh = load(obj_pos, shader, light_dir, tex_file)
         else:
             self.mesh = None
         self.translation = translate(position)
@@ -471,10 +478,10 @@ class Terrain(Surface):
 
 class Water(Surface):
     def __init__(self, texture_map, shader, max_color = 256, max_height = 100, size = 50,
-                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
+                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16, begin_time=0):
         self.attrib = WaterAttributes(texture_map, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
-        self.begin = time.time()
+        self.begin = begin_time
         self.size = size
         super().__init__(texture_map, max_height, size, light_dir, k_a, k_d, k_s, s)
         Mesh.__init__(self, shader=shader, attributes=[self.vertices, self.normals], index=self.indices)

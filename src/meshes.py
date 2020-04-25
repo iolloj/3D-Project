@@ -35,7 +35,7 @@ class PhongMesh(Mesh):
         super().__init__(shader, attributes, index)
         self.light_dir = light_dir
         self.k_a, self.k_d, self.k_s, self.s = k_a, k_d, k_s, s
-        self.begin = time.time()
+        self.begin = 0
 
         # retrieve OpenGL locations of shader variables at initialization
         names = ['light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position', 'time']
@@ -223,17 +223,8 @@ def load_skinned(file, shader, tex_file=None):
         return []
 
     # ------ load texture
-    path = os.path.dirname(file) if os.path.dirname(file) != '' else './'
     for mat in scene.mMaterials:
-        if not tex_file and 'TEXTURE_BASE' in mat.properties:  # texture token
-            name = os.path.basename(mat.properties['TEXTURE_BASE'])
-            # search texture in file's whole subdir since path often screwed up
-            paths = os.walk(path, followlinks=True)
-            found = [os.path.join(d, f) for d, _, n in paths for f in n
-                     if name.startswith(f) or f.startswith(name)]
-            assert found, 'Cannot find texture %s in %s subtree' % (name, path)
-            tex_file = found[0]
-        if tex_file:
+        if tex_file is not None:
             mat.properties['diffuse_map'] = Texture(file=tex_file)
 
     # ----- load animations
