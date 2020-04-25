@@ -35,7 +35,7 @@ class PhongMesh(Mesh):
         super().__init__(shader, attributes, index)
         self.light_dir = light_dir
         self.k_a, self.k_d, self.k_s, self.s = k_a, k_d, k_s, s
-        self.begin = time.time()
+        self.begin = 0
 
         # retrieve OpenGL locations of shader variables at initialization
         names = ['light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position', 'time']
