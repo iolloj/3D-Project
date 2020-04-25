@@ -21,6 +21,8 @@ def main():
     lotus = Object(scene.shaders['test'], "lotus", "../obj/others/lotus/Lotus.fbx", tex_file = "../obj/others/lotus/LotusDiffuse.png")
     scene.add(lotus)
     
+
+
     scene.viewer.run()
 
 
