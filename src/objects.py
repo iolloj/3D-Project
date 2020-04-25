@@ -25,7 +25,7 @@ class Scene:
             'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag"),
             'wave': Shader(shaders_dir+"waves.vert", shaders_dir+"waves.frag"),
             'skinning': Shader(shaders_dir+"skinning.vert", shaders_dir+"skinning.frag"),
-            'test': Shader(shaders_dir+"test.vert", shaders_dir+"waves.frag")
+            'test': Shader(shaders_dir+"test.vert", shaders_dir+"color.frag")
         }
         self.node = Node()
         self.viewer.add(("root", self.node))

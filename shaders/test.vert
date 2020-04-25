@@ -1,5 +1,5 @@
 #version 330 core
-#define nb_waves 2
+#define NB_WAVES 2
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
@@ -23,13 +23,17 @@ uniform struct GerstnerWave {
     float frequency;
     float speed;
 };
-GerstnerWave gerstner_waves[nb_waves] = GerstnerWave[](
-    GerstnerWave(vec2(0., 1.), 0.5, 2., 0.5, 0.5),
-    GerstnerWave(vec2(1., 0.), 1., 1., 0.5, 0.5));
 
-vec3 gerstner_wave_normal(vec3 position, float time) {
+GerstnerWave gerstner_waves[NB_WAVES] = GerstnerWave[](
+    GerstnerWave(vec2(0., 1.), 0.5, 2., 0.5, 0.5),
+    GerstnerWave(vec2(1., 0.), 1., 1., 0.5, 0.5)
+);
+
+vec3 gerstner_wave_normal(vec3 position, float time)
+{
     vec3 wave_normal = vec3(0.0, 1.0, 0.0);
-    for (int i = 0; i <nb_waves; ++i) {
+    
+    for (int i = 0; i <NB_WAVES; ++i) {
         float proj = dot(position.xz, gerstner_waves[i].direction),
               phase = time * gerstner_waves[i].speed,
               psi = proj * gerstner_waves[i].frequency + phase,
@@ -45,12 +49,16 @@ vec3 gerstner_wave_normal(vec3 position, float time) {
 
         wave_normal.x -= x * omega;
         wave_normal.z -= y * omega;
-    } return wave_normal;
+    }
+    
+    return wave_normal;
 }
 
-vec3 gerstner_wave_position(vec2 position, float time) {
+vec3 gerstner_wave_position(vec2 position, float time)
+{
     vec3 wave_position = vec3(position.x, 0, position.y);
-    for (int i = 0; i < nb_waves; ++i) {
+    
+    for (int i = 0; i < NB_WAVES; ++i) {
         float proj = dot(position, gerstner_waves[i].direction),
               phase = time * gerstner_waves[i].speed,
               theta = proj * gerstner_waves[i].frequency + phase,
@@ -66,15 +74,17 @@ vec3 gerstner_wave_position(vec2 position, float time) {
 
         wave_position.x += x * width;
         wave_position.z += y * width;
-    } return wave_position;
+    }
+    
+    return wave_position;
 }
 
-vec3 gerstner_wave(vec2 position, float time, inout vec3 normal) {
+vec3 gerstner_wave(vec2 position, float time, inout vec3 normal)
+{
     vec3 wave_position = gerstner_wave_position(position, time);
     normal = gerstner_wave_normal(wave_position, time);
     return wave_position; // Accumulated Gerstner Wave.
 }
-
 
 
 
