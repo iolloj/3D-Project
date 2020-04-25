@@ -17,8 +17,11 @@ def main():
     # Water generation
     scene.generate_water("../img/blue.jpg", 50)
 
-    test = Object(scene.shaders['test'], "cube", "../obj/others/cube/cube.obj")
-    scene.add(test)
+
+    lotus = Object(scene.shaders['test'], "lotus", "../obj/others/lotus/Lotus.fbx", tex_file = "../obj/others/lotus/LotusDiffuse.png")
+    scene.add(lotus)
+    
+
 
     scene.viewer.run()
 
