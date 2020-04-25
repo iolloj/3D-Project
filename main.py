@@ -22,8 +22,9 @@ def main():
     scene.add(boids, place_boids=boids_placement)
 
     rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
+    rotation_bird = rotate((1, 0, 0), 90) @ rotate((0, 1, 0), 45) @ rotate((0, 0, 1), 30)
     
-    anim = {"rotation_control": True, "key_up": glfw.KEY_UP, "key_down": glfw.KEY_DOWN, "axis": (1, 1, 1)}
+    anim = {"rotation_control": True, "key_up": glfw.KEY_LEFT, "key_down": glfw.KEY_RIGHT, "axis": (0, 0, 1)}
     keyframe_anim = {
         "keyframes": True,
         "translate_keys": {5: vec(0, 0, 0), 8: vec(1, 1, 0), 15: vec(0, 0, 0)},
@@ -44,13 +45,13 @@ def main():
     
     
     #Adding a bird TODO le faire voler autour d'une/des colonne(s) & trouver un oiseau
-    flying_bird = Object(color_shader, "Flying Brid", "obj/others/bird/base.fbx", position=(15, 30, -10), scaling=(1, 1, 1), tex_file = "obj/others/bird/body_baseColor.png")
-    scene.add(flying_bird, rotation_control=anim) #, keyframes=keyframe_anim)
+    flying_bird = Object(color_shader, "Flying Brid", "obj/others/bird/base.fbx", position=(100, 100, 120), scaling=(2, 2, 2), rotation_mat=rotation_bird, tex_file = "obj/others/bird/body_baseColor.png")
+    column.add(flying_bird, rotation_control=anim) #, keyframes=keyframe_anim)
     
     
-    #scene.viewer.add(("seahorse_skinned", *[m for m in load_skinned("obj/Fish/SeaHorse/SeaHorse.fbx", skinning_shader, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png")]))#, position = (15, -10, 250))
-    #seahorse_skinned.set_position(position=(-10, -5, 0), scaling=(0.15, 0.15, 0.15))
-    #scene.update_position(seahorse_skinned)
+    # scene.viewer.add(("seahorse_skinned", *[m for m in load_skinned("obj/Fish/SeaHorse/SeaHorse.fbx", skinning_shader, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png")]))#, position = (15, -10, 250))
+    # seahorse_skinned.set_position(position=(-10, -5, 0), scaling=(0.15, 0.15, 0.15))
+    # scene.update_position(seahorse_skinned)
 
     skybox = Skybox(scene.shaders['skybox'], "img/skybox/right.png", "img/skybox/left.png", "img/skybox/top.png", "img/skybox/bottom.png", "img/skybox/front.png", "img/skybox/back.png")
     scene.add_skybox(skybox)

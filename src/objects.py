@@ -52,8 +52,9 @@ class Scene:
         """
         for obj in objects:
             # check if the arguments have valid names
-            for mesh in obj.mesh:
-                mesh.begin = self.begin
+            if not isinstance(obj, Boids):
+                for mesh in obj.mesh:
+                    mesh.begin = self.begin
             try:
                 names = ["rotation_control", "keyframes", "place_boids"]
                 for key in animation.keys():
