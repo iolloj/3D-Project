@@ -49,6 +49,8 @@ def main():
     column.add(flying_bird, rotation_control=anim) #, keyframes=keyframe_anim)
     
     
+    seahorse = Object(skinning_shader, "seahorse", "obj/Fish/SeaHorse/SeaHorse.fbx", position=(-15, 20, 30), scaling=(0.05, 0.05, 0.05), rotation_axis=(0, 0, 1), rotation_angle=90, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png", animated=True)
+    scene.add(seahorse)
     # scene.viewer.add(("seahorse_skinned", *[m for m in load_skinned("obj/Fish/SeaHorse/SeaHorse.fbx", skinning_shader, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png")]))#, position = (15, -10, 250))
     # seahorse_skinned.set_position(position=(-10, -5, 0), scaling=(0.15, 0.15, 0.15))
     # scene.update_position(seahorse_skinned)

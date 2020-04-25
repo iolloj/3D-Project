@@ -134,12 +134,15 @@ class Scene:
 
 class Object:
     """ Generic object """
-    def __init__(self, shader, name, obj_pos=None, light_dir=(0, 0, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None):
+    def __init__(self, shader, name, obj_pos=None, light_dir=(0, 0, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None, animated=False):
         # Maybe using **kwargs to pass a dictionary
         self.name = name
         self.parent = None
         if obj_pos is not None:
-            self.mesh = load(obj_pos, shader, light_dir, tex_file)
+            if animated:
+                self.mesh = load_skinned(obj_pos, shader, tex_file)
+            else:
+                self.mesh = load(obj_pos, shader, light_dir, tex_file)
         else:
             self.mesh = None
         self.translation = translate(position)

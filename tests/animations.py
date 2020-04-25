@@ -19,7 +19,9 @@ def main():
 
     # Objects
     # scene.viewer.add(("cylinder", SkinnedCylinder(skinning_shader)))
-    scene.viewer.add(("test_skinned", *[m for m in load_skinned("../obj/Fish/BottlenoseDolphin/BottleNoseDolphin.fbx", skinning_shader, tex_file="../obj/Fish/BottlenoseDolphin/BottlenoseDolphin_Base_Color.png")]))
+    # scene.viewer.add(("test_skinned", *[m for m in load_skinned("../obj/Fish/BottlenoseDolphin/BottleNoseDolphin.fbx", skinning_shader, tex_file="../obj/Fish/BottlenoseDolphin/BottlenoseDolphin_Base_Color.png")]))
+    dolphin = Object(skinning_shader, "dolphin", "../obj/Fish/BottlenoseDolphin/BottleNoseDolphin.fbx", tex_file="../obj/Fish/BottlenoseDolphin/BottlenoseDolphin_Base_Color.png", animated=True)
+    scene.add(dolphin)
 
     scene.viewer.run()
 
