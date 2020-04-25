@@ -29,7 +29,7 @@ class KeyFrameControlNode(Node):
 
 
 # A adapter aux dicos de Node puis tester
-class SkinningControlNode(Node_old):
+class SkinningControlNode(Node):
     """ Place node with transform keys above a controlled subtree """
     def __init__(self, *keys, transform=identity()):
         super().__init__(transform=transform)

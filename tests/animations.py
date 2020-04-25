@@ -12,7 +12,7 @@ from src import *
 
 def main():
     # Scene creation
-    scene = Scene("../shaders/", light_dir=(0, 1, 0), camera_dist=10)
+    scene = Scene("../shaders/", light_dir=(0, 1, 0), camera_dist=1500)
 
     # Shader
     skinning_shader = scene.shaders['skinning']
