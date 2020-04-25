@@ -24,7 +24,8 @@ class Scene:
             'terrain': Shader(shaders_dir+"terrain.vert", shaders_dir+"terrain.frag"),
             'skybox': Shader(shaders_dir+"skybox.vert", shaders_dir+"skybox.frag"),
             'wave': Shader(shaders_dir+"waves.vert", shaders_dir+"waves.frag"),
-            'skinning': Shader(shaders_dir+"skinning.vert", shaders_dir+"skinning.frag")
+            'skinning': Shader(shaders_dir+"skinning.vert", shaders_dir+"skinning.frag"),
+            'test': Shader(shaders_dir+"test.vert", shaders_dir+"waves.frag")
         }
         self.node = Node()
         self.viewer.add(("root", self.node))
@@ -288,7 +289,7 @@ class Surface(Mesh):
         GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
         GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
 
-        if time != None:
+        if time is not None:
             GL.glUniform3fv(self.loc['time'], 1, time)
 
         # world camera position for Phong illumination specular component

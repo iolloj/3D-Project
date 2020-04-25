@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from src.viewer import *
 from src.nodes import *
+import time
 
 MAX_BONES = 128
 MAX_VERTEX_BONES = 4
@@ -34,9 +35,10 @@ class PhongMesh(Mesh):
         super().__init__(shader, attributes, index)
         self.light_dir = light_dir
         self.k_a, self.k_d, self.k_s, self.s = k_a, k_d, k_s, s
+        self.begin = time.time()
 
         # retrieve OpenGL locations of shader variables at initialization
-        names = ['light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position']
+        names = ['light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position', 'time']
 
         loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
         self.loc.update(loc)
@@ -52,6 +54,8 @@ class PhongMesh(Mesh):
         GL.glUniform3fv(self.loc['k_d'], 1, self.k_d)
         GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
         GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
+        timesup = time.time() - self.begin
+        GL.glUniform1f(self.loc['time'], timesup)
 
         # world camera position for Phong illumination specular component
         w_camera_position = np.linalg.inv(view)[:,3]
