@@ -34,14 +34,14 @@ void main()
 
     // ------ compute world and normalized eye coordinates of our vertex
     wPosition4 = skinMatrix * vec4(position, 1.0);
-    vec4 pos_to_cam = view * wPosition4;
-    gl_Position = projection * pos_to_cam;
+    vec4 position_relative_to_camera = view * wPosition4;
+    gl_Position = projection * position_relative_to_camera;
 
     fragColor = color;
     frag_tex_coords = uv_coords;
 
     // Underwater fog
-    float distance = length(pos_to_cam.xyz);
+    float distance = length(position_relative_to_camera.xyz);
     visibility = exp(-pow((distance * density), gradient));
     visibility = clamp(visibility, 0.0, 1.0);
 }

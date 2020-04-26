@@ -13,12 +13,14 @@ out vec2 frag_tex_coords;
 
 // Underwater fog variables
 out float visibility;
+out vec4 world_coords;
 const float density = 0.007;
 const float gradient = 1;
 
 void main() {
     pos = position;
-    vec4 pos_to_cam =  view * model * vec4(position, 1);
+    world_coords = model * vec4(position, 1);
+    vec4 pos_to_cam =  view * world_coords;
     gl_Position = projection * pos_to_cam;
     
     // Normals

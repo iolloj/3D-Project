@@ -5,6 +5,7 @@ in vec3 w_position, w_normal;   // in world coodinates
 in vec3 my_normal;
 in vec3 pos;
 in float visibility;
+in vec4 world_coords;
 
 // light dir, in world coordinates
 uniform vec3 light_dir;
@@ -39,7 +40,7 @@ void main() {
     vec4 kd = texture(diffuse_map, frag_tex_coords);
 
     // Shades of blue varying with the depth
-    if (pos.y < 2)
+    if (world_coords.y < 2)
         kd += vec4(pos.y/20, pos.y/20, pos.y/200, 1)/2;
 
     // Phong model + texture
@@ -49,6 +50,6 @@ void main() {
         out_color = kd * max(0, dot(n, l)) + vec4(k_a + k_s * pow(max(0, dot(r, v)), s), 1);
 
     // Underwater fog
-    if (pos.y < 0)
+    if (world_coords.y < 0)
         out_color = mix(vec4(0.1, 0.1, 0.1, 1), out_color, visibility);
 }
