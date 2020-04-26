@@ -14,9 +14,17 @@ out vec3 pos;
 // texture coordinates
 out vec2 frag_tex_coords;
 
-void main() {
-    gl_Position = projection * view * model * vec4(position, 1.0);
+// Underwater fog variables
+out float visibility;
+out vec4 world_coords;
+const float density = 0.007;
+const float gradient = 1;
 
+void main() {
+    world_coords = model * vec4(position, 1);
+    vec4 pos_to_cam =  view * world_coords;
+    gl_Position = projection * pos_to_cam;
+    
     w_normal = (model * vec4(normal, 0)).xyz;
 
     // Transformation
@@ -26,4 +34,9 @@ void main() {
 
     pos = position;
     frag_tex_coords = uv_coords;
+
+    // Underwater fog
+    float distance = length(pos_to_cam.xyz);
+    visibility = exp(-pow((distance * density), gradient));
+    visibility = clamp(visibility, 0.0, 1.0);
 }
