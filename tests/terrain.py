@@ -12,10 +12,10 @@ from src import *
 
 def main():
     # Scene creation
-    scene = Scene("../shaders/", light_dir=(0, 1, 1), camera_dist=2000)
+    scene = Scene("../shaders/", light_dir=(0, 1, 1), camera_dist=200)
     
     # Terrain generation
-    scene.generate_terrain("../img/sand.jpg", "../img/perlin_noise.png", 2000, 10000)
+    scene.generate_terrain("../img/sand.jpg", "../img/perlin_noise.png", 200, 1000)
 
     scene.viewer.run()
 

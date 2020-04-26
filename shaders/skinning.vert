@@ -17,6 +17,13 @@ layout(location = 4) in vec4 bone_weights;
 // ----- interpolated attribute variables to be passed to fragment shader
 out vec3 fragColor;
 out vec2 frag_tex_coords;
+out vec4 wPosition4;
+
+
+// Underwater fog variables
+out float visibility;
+const float density = 0.007;
+const float gradient = 1;
 
 void main()
 {
@@ -26,9 +33,15 @@ void main()
         skinMatrix += bone_weights[b] * boneMatrix[int(bone_ids[b])];
 
     // ------ compute world and normalized eye coordinates of our vertex
-    vec4 wPosition4 = skinMatrix * vec4(position, 1.0);
-    gl_Position = projection * view * wPosition4;
+    wPosition4 = skinMatrix * vec4(position, 1.0);
+    vec4 pos_to_cam = view * wPosition4;
+    gl_Position = projection * pos_to_cam;
 
     fragColor = color;
     frag_tex_coords = uv_coords;
+
+    // Underwater fog
+    float distance = length(pos_to_cam.xyz);
+    visibility = exp(-pow((distance * density), gradient));
+    visibility = clamp(visibility, 0.0, 1.0);
 }

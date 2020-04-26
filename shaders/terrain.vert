@@ -11,10 +11,15 @@ out vec3 my_normal;
 out vec3 pos;
 out vec2 frag_tex_coords;
 
+// Underwater fog variables
+out float visibility;
+const float density = 0.007;
+const float gradient = 1;
+
 void main() {
     pos = position;
-    
-    gl_Position = projection * view * model * vec4(position, 1);
+    vec4 pos_to_cam =  view * model * vec4(position, 1);
+    gl_Position = projection * pos_to_cam;
     
     // Normals
     w_normal = (model * vec4(normal, 0)).xyz;
@@ -25,4 +30,9 @@ void main() {
     my_normal = nit * normal;
 
     frag_tex_coords = position.xz;
+
+    // Underwater fog
+    float distance = length(pos_to_cam.xyz);
+    visibility = exp(-pow((distance * density), gradient));
+    visibility = clamp(visibility, 0.0, 1.0);
 }
