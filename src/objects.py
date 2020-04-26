@@ -526,7 +526,7 @@ class Boids:
     Testing phase
     """
     # En ajoutant les contraintes, l'orientation déconne
-    def __init__(self, shader, number, model, scaling, index):
+    def __init__(self, shader, number, model, scaling, index, tex_file=None):
         """
         For now, number has to be a perfect cube
         """
@@ -559,8 +559,6 @@ class Boids:
 
         roots = []
         for i in range(number):
-            # Open FBX files if they provide a skeleton
-
             # To be able to rotate the boids in their own spatial system
             roots.append(Object(shader, "root_{}".format(i), position=self.positions[i], scaling=(scaling, scaling, scaling)))
 
@@ -568,7 +566,7 @@ class Boids:
             axis = np.cross(vec(0, 0, 1), self.orientations[i])
             angle =  np.arccos(np.dot(vec(0, 0, 1), self.orientations[i])) * 360 / (2 * np.pi)
             rotation_mat = rotate(self.orientations[i], 180) @ rotate(axis, angle) @ rotate(vec(0, 0, 1), 180)
-            roots[i].add(Object(shader, "boid_{}".format(i), model, rotation_mat=rotation_mat))
+            roots[i].add(Object(shader, "boid_{}".format(i), model, rotation_mat=rotation_mat, tex_file=tex_file, animated=True))
 
             # self.boids.append(Object(shader, "boid_{}".format(i), model, position=self.positions[i], scaling=(scale, scale, scale)))
             self.boids.append(roots[i])

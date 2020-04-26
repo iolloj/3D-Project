@@ -15,7 +15,7 @@ def main():
     #Generates the water surfacer
     scene.generate_water("img/blue.jpg", 1000)
 
-    boids = Boids(color_shader, 27, "obj/Fish/BlueTang/BlueTang.obj", scaling=0.3, index=0)
+    boids = Boids(skinning_shader, 19, "obj/Fish/BlueTang/BlueTang.fbx", scaling=0.003, index=0, tex_file="obj/Fish/BlueTang/BlueTang_Base_Color.png")
     boids_placement = {
         "position": (-5, -15, 200)
     }
