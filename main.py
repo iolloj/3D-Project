@@ -31,7 +31,17 @@ def main():
         "rotate_keys": {5: quaternion(), 8: quaternion_from_euler(180, 45, 90), 10: quaternion_from_euler(180, 0, 180), 15: quaternion()},
         "scale_keys": {5: 1, 8: 0.5, 15: 1}
     }
+
+    dolphin_keyframes = {
+        "keyframes": True,
+        "translate_keys": {20: vec(0, 0, 0), 30: vec(0, 0, 30), 40: vec(0, 0, -30)},
+        "rotate_keys": {20: quaternion(), 30: quaternion(0, 0, 0), 40: quaternion()},
+        "scale_keys": {20: 1, 30: 1, 40: 1}
+    }
     
+    dolphin = Object(skinning_shader, "dolphin", "obj/Fish/BottlenoseDolphin/BottleNoseDolphin.fbx", position=(10, 0, 150), scaling=(0.01, 0.01, 0.01), tex_file="obj/Fish/BottlenoseDolphin/BottlenoseDolphin_Base_Color.png", animated=True)
+    scene.add(dolphin, keyframes=dolphin_keyframes)
+
     #Loading and adding Hercules to the scene TODO Tourver la bonne rotation
     Hercules = Object(color_shader, "Hercules", "obj/others/hercules/Hercules.obj", position=(10, -20, 150), scaling=(0.7, 0.7, 0.7 ), rotation_axis=(1, 0, 0), rotation_angle=-90, tex_file="obj/others/hercules/Hercules.jpg")
     scene.add(Hercules)
