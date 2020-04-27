@@ -21,6 +21,8 @@ uniform vec3 w_camera_position;
 
 // texture
 uniform sampler2D diffuse_map;
+uniform sampler2D caustics;
+
 in vec2 frag_tex_coords;
 
 out vec4 out_color;
@@ -37,7 +39,7 @@ void main() {
     // Point P in camera space is the view vector
     vec3 v = normalize(pos);
     
-    vec4 kd = texture(diffuse_map, frag_tex_coords);
+    vec4 kd = texture(caustics, frag_tex_coords);
 
     // Shades of blue varying with the depth
     if (world_coords.y < 2)
