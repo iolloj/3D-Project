@@ -15,10 +15,10 @@ def main():
     scene = Scene("../shaders/", light_dir=(0, 0, 0), camera_dist=50)
 
     # Shader
-    color_shader = scene.shaders['color']
+    skinning_shader = scene.shaders['skinning']
 
     # Boids
-    boids = Boids(color_shader, 27, "../obj/Fish/BlueTang/BlueTang.obj", scaling=0.1, index=0)
+    boids = Boids(skinning_shader, 27, "../obj/Fish/BlueTang/BlueTang.fbx", scaling=0.001, index=0, tex_file="../obj/Fish/BlueTang/BlueTang_Base_Color.png")
    
     scene.add(boids)
 
