@@ -32,8 +32,8 @@ def main():
         "scale_keys": {5: 1, 8: 0.5, 15: 1}
     }
     
-    #Loading and adding Hercules to the scene TODO Tourver la bonne rotation
-    Hercules = Object(color_shader, "Hercules", "obj/others/hercules/Hercules.obj", position=(10, -20, 150), scaling=(0.7, 0.7, 0.7 ), rotation_axis=(1, 0, 0), rotation_angle=-90, tex_file="obj/others/hercules/Hercules.jpg")
+    #Loading and adding Hercules to the scene
+    Hercules = Object(color_shader, "Hercules", "obj/others/hercules/Hercules.obj", position=(20, -20, 150), scaling=(0.7, 0.7, 0.7 ), rotation_axis=(1, 0, 0), rotation_angle=-90, tex_file="obj/others/hercules/Hercules.jpg")
     scene.add(Hercules)
     
     #Loading the two columns, ionic and ionic_2
@@ -43,18 +43,26 @@ def main():
     #Adding the columns to the scene
     scene.add(column, column_2)
     
+    seaweed = Object(color_shader, "seaweed", "obj/others/seaweed/seaweed.dae", position=(5, -35, 150), scaling=(5, 5, 5), rotation_axis=(0, 1, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
+    scene.add(seaweed)
+        
     
-    #Adding a bird TODO le faire voler autour d'une/des colonne(s) & trouver un oiseau
-    flying_bird = Object(color_shader, "Flying Brid", "obj/others/bird/base.fbx", position=(100, 100, 120), scaling=(2, 2, 2), rotation_mat=rotation_bird, tex_file = "obj/others/bird/body_baseColor.png")
-    column.add(flying_bird, rotation_control=anim) #, keyframes=keyframe_anim)
+    #Adding a flying bird around the columns
+    flying_bird = Object(color_shader, "Flying Brid", "obj/others/bird/base.fbx", position=(100, 100, 120), scaling=(3, 3, 3), rotation_mat=rotation_bird, tex_file = "obj/others/bird/body_baseColor.png")
+    column.add(flying_bird, rotation_control=anim)
     
     
-    seahorse = Object(skinning_shader, "seahorse", "obj/Fish/SeaHorse/SeaHorse.fbx", position=(-15, 20, 30), scaling=(0.05, 0.05, 0.05), rotation_axis=(0, 0, 1), rotation_angle=90, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png", animated=True)
+    seahorse = Object(skinning_shader, "seahorse", "obj/Fish/SeaHorse/SeaHorse.fbx", position=(5, -20, 150), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png", animated=True)
     scene.add(seahorse)
+<<<<<<< HEAD
     # scene.viewer.add(("seahorse_skinned", *[m for m in load_skinned("obj/Fish/SeaHorse/SeaHorse.fbx", skinning_shader, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png")]))#, position = (15, -10, 250))
     # seahorse_skinned.set_position(position=(-10, -5, 0), scaling=(0.15, 0.15, 0.15))
     # scene.update_position(seahorse_skinned)
-    """
+
+    reefFish = Object(skinning_shader, "reefFish", "obj/Fish/ReefFish20/reeffish20.fbx", position=(-25, -8, 140), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/ReefFish20/ReefFish20_Base_Color.png", animated=True)
+    scene.add(reefFish)
+    """    
+    
     skybox = Skybox(scene.shaders['skybox'], "img/skybox/right.png", "img/skybox/left.png", "img/skybox/top.png", "img/skybox/bottom.png", "img/skybox/front.png", "img/skybox/back.png")
     scene.add_skybox(skybox)
 

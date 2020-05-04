@@ -304,7 +304,7 @@ class Surface(Mesh):
         if self.caustics is not None:
             GL.glActiveTexture(GL.GL_TEXTURE1)
             GL.glBindTexture(GL.GL_TEXTURE_2D, self.caustics.glid)
-            GL.glUniform1i(self.loc['caustics'], 2)
+            GL.glUniform1i(self.loc['caustics'], 1)
         # world camera position for Phong illumination specular component
         w_camera_position = np.linalg.inv(view)[:,3]
         GL.glUniform3fv(self.loc['w_camera_position'], 1, w_camera_position)
