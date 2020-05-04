@@ -13,7 +13,7 @@ def main():
     scene.generate_terrain("img/sand.jpg", "img/perlin_noise.png", 200, 1000, -10, "img/sun_Mapping.jpg")
     
     #Generates the water surfacer
-    scene.generate_water("img/blue.jpg", 1000)
+    #scene.generate_water("img/blue.jpg", 400)
     """
     boids = Boids(skinning_shader, 19, "obj/Fish/BlueTang/BlueTang.fbx", scaling=0.003, index=0, tex_file="obj/Fish/BlueTang/BlueTang_Base_Color.png")
     boids_placement = {

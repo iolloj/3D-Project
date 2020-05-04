@@ -47,6 +47,6 @@ void main() {
         out_color.a = alpha;
     } else {
         out_color = kd * max(0, dot(n, l)) + vec4(k_a + k_s * pow(max(0, dot(r, v)), s), 1);
-        out_color.a = alpha;
+        //out_color.a = alpha;
     }
 }
