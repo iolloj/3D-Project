@@ -15,6 +15,7 @@ import glfw                         # lean window system wrapper for OpenGL
 import numpy as np                  # all matrix manipulations & OpenGL args
 import assimpcy                     # 3D resource loader
 import copy
+import random
 
 from src.transform import *
 
@@ -141,8 +142,14 @@ class Node:
 
     def add(self, *drawables):
         """ Add drawables to this node, simply updating children list """
-        assert len(drawables[0]) == 2, "Expected a name and a node"
-        tmp_dict = {drawable[0]: drawable[1] for drawable in drawables}
+        # assert len(drawables[0]) == 2, "Expected a name and a node"
+        tmp_dict = {}
+        for drawable in drawables:
+            # to avoid a loading problem in load_skinned
+            if not isinstance(drawable, tuple):
+                tmp_dict.update({str(random.randint(0, 1e30)): drawable})
+            else:
+                tmp_dict.update({drawable[0]: drawable[1]})
         self.children.update(tmp_dict)
 
     def add_skybox(self, skybox):
