@@ -34,9 +34,9 @@ class Scene:
         self.water = None
         self.begin = time.time()
 
-    def generate_terrain(self, texture, height, max_height, size, translation=0):
+    def generate_terrain(self, texture, height, max_height, size, translation=0, caustics=None):
         self.terrain = Terrain(texture, height, self.shaders['terrain'], max_height=max_height, translation=translation,
-                               size=size, light_dir=self.light_dir)
+                               size=size, light_dir=self.light_dir, caustics=caustics, begin_time=self.begin)
         self.viewer.add(("terrain", self.terrain))
 
     def generate_water(self, texture, size):
@@ -253,7 +253,7 @@ class Cylinder(Node):
 class Surface(Mesh):
     """ Generic surface """
     def __init__(self, texture_map, max_height = 10, size = 50, light_dir=(0, 1, 0),
-                 k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
+                 k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16, caustics=None):
         self.light_dir = light_dir
         self.k_a, self.k_d, self.k_s, self.s = k_a, k_d, k_s, s
 
@@ -268,7 +268,9 @@ class Surface(Mesh):
         # setup texture and upload it to GPU
         # Peut-être aussi vérifier pour names
         self.texture = Texture(texture_map, self.wrap_mode, *self.filter_mode)
-
+        self.caustics = caustics
+        if caustics is not None:
+            self.caustics = Texture(caustics, self.wrap_mode, *self.filter_mode)
     def key_handler(self, key):
         # some interactive elements
         if key == glfw.KEY_F6:
@@ -278,7 +280,7 @@ class Surface(Mesh):
             self.filter_mode = next(self.filter)
             self.texture = Texture(self.texture_map, self.wrap_mode, *self.filter_mode)
 
-    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES, time=None):
+    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES, time=None, caustics=None):
         """ vérifier pour diffuse_map ? """
         GL.glUseProgram(self.shader.glid)
 
@@ -296,9 +298,10 @@ class Surface(Mesh):
         GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
         GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
 
-        if time is not None:
-            GL.glUniform3fv(self.loc['time'], 1, time)
-
+        if self.caustics is not None:
+            GL.glActiveTexture(GL.GL_TEXTURE1)
+            GL.glBindTexture(GL.GL_TEXTURE_2D, self.caustics.glid)
+            GL.glUniform1i(self.loc['caustics'], 1)
         # world camera position for Phong illumination specular component
         w_camera_position = np.linalg.inv(view)[:,3]
         GL.glUniform3fv(self.loc['w_camera_position'], 1, w_camera_position)
@@ -317,7 +320,7 @@ class Attributes:
 
 
 class TerrainAttributes(Attributes):
-    def __init__(self, texture_map, height_map, translation, max_color, max_height, size):
+    def __init__(self, texture_map, height_map,translation, max_color, max_height, size):
         super().__init__(texture_map, max_color, max_height, size)
         self.translation = translation
         height = Image.open(height_map).convert('L')
@@ -460,21 +463,47 @@ class Terrain(Surface):
     """ Simple first textured object """
     # Ajouter assertion si fichiers non trouvés
     def __init__(self, texture_map, height_map, shader, translation = 0, max_color = 256, max_height = 10, size = 50,
-                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16):
+                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16, caustics=None, begin_time=None):
         self.attrib = TerrainAttributes(texture_map, height_map, translation, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
 
-        super().__init__(texture_map, max_height, size, light_dir, k_a, k_d, k_s, s)
+        super().__init__(texture_map, max_height, size, light_dir, k_a, k_d, k_s, s, caustics)
         Mesh.__init__(self, shader=shader, attributes=[self.vertices, self.normals], index=self.indices)
-
-        names = ['diffuse_map', 'light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position']
+        self.begin = begin_time
+        names = ['diffuse_map', 'light_dir', 'k_a', 's', 'k_s', 'k_d', 'w_camera_position', 'caustics', 'time']
         loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
         self.loc.update(loc)
 
         print('Loaded terrain \t(x=[%s, %s], z=[%s, %s], %s faces)' % (-self.attrib.size/2, self.attrib.size/2,
                                                                        -self.attrib.size/2, self.attrib.size/2,
                                                                        (self.attrib.height_map.size[0]**2) * 2))
+    
+    
+    def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES):
+        """ vérifier pour diffuse_map ? """
+        GL.glUseProgram(self.shader.glid)
 
+        # texture access setups
+        GL.glActiveTexture(GL.GL_TEXTURE0)
+        GL.glBindTexture(GL.GL_TEXTURE_2D, self.texture.glid)
+        GL.glUniform1i(self.loc['diffuse_map'], 0)
+
+        # setup light parameters
+        GL.glUniform3fv(self.loc['light_dir'], 1, self.light_dir)
+
+        # setup material parameters
+        GL.glUniform3fv(self.loc['k_a'], 1, self.k_a)
+        GL.glUniform3fv(self.loc['k_d'], 1, self.k_d)
+        GL.glUniform3fv(self.loc['k_s'], 1, self.k_s)
+        GL.glUniform1f(self.loc['s'], max(self.s, 0.001))
+        timesup = time.time() - self.begin
+        GL.glUniform1f(self.loc['time'], timesup)
+
+        # world camera position for Phong illumination specular component
+        w_camera_position = np.linalg.inv(view)[:,3]
+        GL.glUniform3fv(self.loc['w_camera_position'], 1, w_camera_position)
+
+        super().draw(projection, view, model, primitives)
 
 class Water(Surface):
     def __init__(self, texture_map, shader, max_color = 256, max_height = 100, size = 50,

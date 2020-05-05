@@ -1,5 +1,5 @@
 #version 330 core
-#define nb_waves 2
+#define nb_waves 4
 
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec3 normal;
@@ -23,8 +23,11 @@ uniform struct GerstnerWave {
     float speed;
 };
 GerstnerWave gerstner_waves[nb_waves] = GerstnerWave[](
-    GerstnerWave(vec2(0., 1.), 0.5, 2., 0.5, 0.5),
-    GerstnerWave(vec2(1., 0.), 1., 1., 0.5, 0.5));
+    GerstnerWave(vec2(0., 1.), 1.8, 0.2, 0.07, 0.5),
+    GerstnerWave(vec2(1., 0.), 2.5, 0.1, 0.02, 0.2),
+    GerstnerWave(vec2(-1, 0.7), 0.8, 0.5, 0.09, 0.4),
+    GerstnerWave(vec2(3., -4.), 1.2, 0.3, 0.04, 0.3)
+    );
 
 vec3 gerstner_wave_normal(vec3 position, float time) {
     vec3 wave_normal = vec3(0.0, 1.0, 0.0);
