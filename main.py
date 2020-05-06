@@ -13,8 +13,7 @@ def main():
     scene.generate_terrain("img/sand.jpg", "img/perlin_noise.png", 200, 1000, -10, "img/sun_Mapping.jpg")
     
     #Generates the water surfacer
-    scene.generate_water("img/blue.jpg", 400)
-    """
+    scene.generate_water("img/blue.jpg", 1000)
     boids = Boids(skinning_shader, 19, "obj/Fish/BlueTang/BlueTang.fbx", scaling=0.003, index=0, tex_file="obj/Fish/BlueTang/BlueTang_Base_Color.png")
     boids_placement = {
         "position": (-5, -15, 200)
@@ -64,14 +63,9 @@ def main():
     
     seahorse = Object(skinning_shader, "seahorse", "obj/Fish/SeaHorse/SeaHorse.fbx", position=(5, -20, 150), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png", animated=True)
     scene.add(seahorse)
-<<<<<<< HEAD
-    # scene.viewer.add(("seahorse_skinned", *[m for m in load_skinned("obj/Fish/SeaHorse/SeaHorse.fbx", skinning_shader, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png")]))#, position = (15, -10, 250))
-    # seahorse_skinned.set_position(position=(-10, -5, 0), scaling=(0.15, 0.15, 0.15))
-    # scene.update_position(seahorse_skinned)
 
     reefFish = Object(skinning_shader, "reefFish", "obj/Fish/ReefFish20/reeffish20.fbx", position=(-25, -8, 140), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/ReefFish20/ReefFish20_Base_Color.png", animated=True)
     scene.add(reefFish)
-    """    
     
     skybox = Skybox(scene.shaders['skybox'], "img/skybox/right.png", "img/skybox/left.png", "img/skybox/top.png", "img/skybox/bottom.png", "img/skybox/front.png", "img/skybox/back.png")
     scene.add_skybox(skybox)
