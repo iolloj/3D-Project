@@ -18,7 +18,7 @@ def main():
     scene.generate_water("../img/blue.jpg", 50)
 
 
-    lotus = Object(scene.shaders['test'], "lotus", "../obj/others/lotus/Lotus.fbx", tex_file = "../obj/others/lotus/LotusDiffuse.png")
+    lotus = Object(scene.shaders['waterlily'], "lotus", "../obj/others/lotus/Lotus.fbx", tex_file = "../obj/others/lotus/LotusDiffuse.png")
     scene.add(lotus)
     
 
