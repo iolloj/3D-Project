@@ -208,7 +208,7 @@ def load(file, shader, light_dir=(0, 0, 0), tex_file=None):
         meshes.append(mesh)
 
     size = sum((mesh.mNumFaces for mesh in scene.mMeshes))
-    print('Loaded %s\t(%d meshes, %d faces)' % (file, len(meshes), size))
+    # print('Loaded %s\t(%d meshes, %d faces)' % (file, len(meshes), size))
     return meshes
 
 
@@ -291,6 +291,6 @@ def load_skinned(file, shader, tex_file=None):
             node.add(mesh)
 
     nb_triangles = sum((mesh.mNumFaces for mesh in scene.mMeshes))
-    print('Loaded', file, '\t(%d meshes, %d faces, %d nodes, %d animations)' %
-          (scene.mNumMeshes, nb_triangles, len(nodes), scene.mNumAnimations))
+    # print('Loaded', file, '\t(%d meshes, %d faces, %d nodes, %d animations)' %
+    #       (scene.mNumMeshes, nb_triangles, len(nodes), scene.mNumAnimations))
     return [root_node]

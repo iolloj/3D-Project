@@ -9,6 +9,8 @@ def main():
     color_shader = scene.shaders['color']
     skinning_shader = scene.shaders['skinning']
 
+    print("Loading...")
+
     #Generates sur sand surface
     scene.generate_terrain("img/sand.jpg", "img/perlin_noise.png", 200, 1000, -10, "img/sun_Mapping.jpg")
     
@@ -69,6 +71,8 @@ def main():
     
     skybox = Skybox(scene.shaders['skybox'], "img/skybox/right.png", "img/skybox/left.png", "img/skybox/top.png", "img/skybox/bottom.png", "img/skybox/front.png", "img/skybox/back.png")
     scene.add_skybox(skybox)
+
+    print("Scene successfully loaded")
 
     scene.viewer.run()
 

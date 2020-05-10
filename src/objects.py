@@ -458,9 +458,9 @@ class Terrain(Surface):
         loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
         self.loc.update(loc)
 
-        print('Loaded terrain \t(x=[%s, %s], z=[%s, %s], %s faces)' % (-self.attrib.size/2, self.attrib.size/2,
-                                                                       -self.attrib.size/2, self.attrib.size/2,
-                                                                       (self.attrib.height_map.size[0]**2) * 2))
+        # print('Loaded terrain \t(x=[%s, %s], z=[%s, %s], %s faces)' % (-self.attrib.size/2, self.attrib.size/2,
+        #                                                                -self.attrib.size/2, self.attrib.size/2,
+        #                                                                (self.attrib.height_map.size[0]**2) * 2))
     
     
     def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES):
@@ -503,9 +503,9 @@ class Water(Surface):
         loc = {n: GL.glGetUniformLocation(shader.glid, n) for n in names}
         self.loc.update(loc)
 
-        print('Loaded terrain \t(x=[%s, %s], z=[%s, %s], %s faces)' % (-self.attrib.size/2, self.attrib.size/2,
-                                                                       -self.attrib.size/2, self.attrib.size/2,
-                                                                       (self.size**2) * 2))
+        # print('Loaded water \t(x=[%s, %s], z=[%s, %s], %s faces)' % (-self.attrib.size/2, self.attrib.size/2,
+        #                                                                -self.attrib.size/2, self.attrib.size/2,
+        #                                                                (self.size**2) * 2))
 
     def draw(self, projection, view, model, primitives=GL.GL_TRIANGLES):
         """ vérifier pour diffuse_map ? """

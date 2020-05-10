@@ -170,7 +170,7 @@ class Texture:
             GL.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, mag_filter)
             GL.glGenerateMipmap(GL.GL_TEXTURE_2D)
             message = 'Loaded texture %s\t(%s, %s, %s, %s)'
-            print(message % (file, tex.shape, wrap_mode, min_filter, mag_filter))
+            # print(message % (file, tex.shape, wrap_mode, min_filter, mag_filter))
         except FileNotFoundError:
             print("ERROR: unable to load texture file %s" % file)
 
