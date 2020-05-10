@@ -74,6 +74,11 @@ def main():
     #animated fish
     reefFish = Object(skinning_shader, "reefFish", "obj/Fish/ReefFish20/reeffish20.fbx", position=(-25, -8, 140), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/ReefFish20/ReefFish20_Base_Color.png", animated=True)
     scene.add(reefFish)
+    
+    #nenuphar
+    lotus = Object(scene.shaders['waterlily'], "lotus", "obj/others/lotus/Lotus.fbx",position=(-5, 0, 140), tex_file = "obj/others/lotus/LotusDiffuse.png")
+    scene.add(lotus)
+    
 
     # Hierarchical keyboard control
     rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
@@ -95,6 +100,7 @@ def main():
     # granit_cube.add(cube, rotation_control=y_rotation)
     # cube_root.add(granit_cube, rotation_control=x_rotation)
     # scene.add(cube_root)
+    
     
     # Skybox
     skybox = Skybox(scene.shaders['skybox'], "img/skybox/right.png", "img/skybox/left.png", "img/skybox/top.png", "img/skybox/bottom.png", "img/skybox/front.png", "img/skybox/back.png")
