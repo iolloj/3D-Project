@@ -40,7 +40,7 @@ void main() {
     vec4 kd = texture(diffuse_map, frag_tex_coords);
 
     // Phong model + texture
-    float alpha = 0.5;
+    float alpha = 0.7;
     if (light_dir == vec3(0, 0, 0)) {
         out_color = kd;
         out_color.a = alpha;

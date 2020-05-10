@@ -447,7 +447,7 @@ class WaterAttributes(Attributes):
 class Terrain(Surface):
     """ Simple first textured object """
     def __init__(self, texture_map, height_map, shader, translation = 0, max_color = 256, max_height = 10, size = 50,
-                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16, caustics=None, begin_time=None):
+                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.6, 0.6, 0.6), s=16, caustics=None, begin_time=None):
         self.attrib = TerrainAttributes(texture_map, height_map, translation, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
 
@@ -491,7 +491,7 @@ class Terrain(Surface):
 
 class Water(Surface):
     def __init__(self, texture_map, shader, max_color = 256, max_height = 100, size = 50,
-                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16, begin_time=0):
+                 light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(0, 0, 1), k_s=(1, 1, 1), s=10, begin_time=0):
         self.attrib = WaterAttributes(texture_map, max_color, max_height, size)
         self.vertices, self.normals, self.indices = self.attrib.generate_attributes()
         self.begin = begin_time
