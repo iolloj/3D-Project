@@ -73,6 +73,7 @@ Here are some remarks on the projects and some improvement ideas.
 ### Possible extensions
 
 * Improving the boids model using englobing spheres
+* Adding Perlin noise to the water surface
 * Using spline interpolation instead of linear interpolation for the keyframes
 * Postprocessing for the underwater effects by creating a texture and applying filters on it (blue filter for instance)
 * Tessellation for the water surface computation to be faster, using an intermediate tessellation control shader

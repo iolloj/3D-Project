@@ -63,6 +63,33 @@ vec3 gerstner_wave_normal(vec3 position, float time) {
     } return wave_normal;
 }
 
+vec3 gerstner_wave_position(vec2 position, float time) {
+    vec3 wave_position = vec3(position.x, 0, position.y);
+    for (int i = 0; i < nb_waves; ++i) {
+        float proj = dot(position, gerstner_waves[i].direction),
+              phase = time * gerstner_waves[i].speed,
+              theta = proj * gerstner_waves[i].frequency + phase,
+              height = gerstner_waves[i].amplitude * sin(theta);
+
+        wave_position.y += height;
+
+        float maximum_width = gerstner_waves[i].steepness *
+                              gerstner_waves[i].amplitude,
+              width = maximum_width * cos(theta),
+              x = gerstner_waves[i].direction.x,
+              y = gerstner_waves[i].direction.y;
+
+        wave_position.x += x * width;
+        wave_position.z += y * width;
+    } return wave_position;
+}
+
+vec3 gerstner_wave(vec2 position, float time, inout vec3 normal) {
+    vec3 wave_position = gerstner_wave_position(position, time);
+    normal = gerstner_wave_normal(wave_position, time);
+    return wave_position; // Accumulated Gerstner Wave.
+}
+
 vec3 line_plane_intercept(vec3 lineP,
                             vec3 lineN,
                             vec3 planeN,
@@ -75,7 +102,9 @@ vec3 line_plane_intercept(vec3 lineP,
 void main() {
     // Object frame
     vec3 n = normalize(w_normal);
-    // World frame
+    vec3 n2 = normalize(w_normal);
+    vec3 wave = gerstner_wave(pos.xz, time, n2);
+   // World frame
     //vec3 n = normalize(my_normal);
 
     vec3 waveN = gerstner_wave_normal(pos, time);
@@ -93,7 +122,7 @@ void main() {
     vec4 kd = texture(diffuse_map, frag_tex_coords);
 
     // Shades of blue varying with the depth
-    if (world_coords.y < 2)
+    if (world_coords.y < wave.y)
         kd += vec4(pos.y/20, pos.y/20, pos.y/200, 1)/2;
 
     // Phong model + texture
@@ -103,7 +132,7 @@ void main() {
         out_color = kd * max(0, dot(n, l)) + vec4(k_a + k_s * pow(max(0, dot(r, v)), s), 1);
 
     // Underwater fog
-    if (world_coords.y < 0){
+    if (world_coords.y < wave.y){
         out_color = mix(vec4(0.0, 0.0, 0.3, 1), out_color, visibility);
         out_color += mix(vec4(0.0, 0.0, 0.3, 1), vec4(0.5*vec3(texture(caustics, 0.008*intercept.xz)), 0.1), visibility);
     }

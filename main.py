@@ -74,7 +74,29 @@ def main():
     #animated fish
     reefFish = Object(skinning_shader, "reefFish", "obj/Fish/ReefFish20/reeffish20.fbx", position=(-25, -8, 140), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/ReefFish20/ReefFish20_Base_Color.png", animated=True)
     scene.add(reefFish)
+
+    # Hierarchical keyboard control
+    rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
+    x_rotation = {"rotation_control": True,
+                  "key_up": glfw.KEY_DOWN,
+                  "key_down": glfw.KEY_UP,
+                  "axis": (1, 0, 0)
+                 }
+    y_rotation = {"rotation_control": True,
+                  "key_up": glfw.KEY_RIGHT,
+                  "key_down": glfw.KEY_LEFT,
+                  "axis": (0, 1, 0)
+                 }
+
+    # cube_root = Object(color_shader, "cube_root", "obj/others/cube/cube.obj", position=(10, -50, 200), scaling=(0.0001, 0.0001, 0.0001))
+    # granit_cube = Object(color_shader, "granit_cube", "obj/others/cube/cube.obj", scaling=(1e5, 1e5, 1e5), tex_file="img/granit.jpg")
+    # cube = Object(color_shader, "cube", "obj/others/cube/cube.obj", position=(0, 0.85, 0), scaling=(0.7, 0.7, 0.7))
+
+    # granit_cube.add(cube, rotation_control=y_rotation)
+    # cube_root.add(granit_cube, rotation_control=x_rotation)
+    # scene.add(cube_root)
     
+    # Skybox
     skybox = Skybox(scene.shaders['skybox'], "img/skybox/right.png", "img/skybox/left.png", "img/skybox/top.png", "img/skybox/bottom.png", "img/skybox/front.png", "img/skybox/back.png")
     scene.add_skybox(skybox)
 
