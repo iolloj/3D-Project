@@ -23,7 +23,7 @@ out vec4 wPosition4;
 // Underwater fog variables
 out float visibility;
 const float density = 0.007;
-const float gradient = 1;
+const float gradient = 1.3;
 
 void main()
 {
@@ -43,5 +43,4 @@ void main()
     // Underwater fog
     float distance = length(position_relative_to_camera.xyz);
     visibility = exp(-pow((distance * density), gradient));
-    visibility = clamp(visibility, 0.0, 1.0);
 }
