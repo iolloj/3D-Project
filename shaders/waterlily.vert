@@ -11,6 +11,12 @@ out vec3 my_normal;
 out vec3 pos;
 out vec2 frag_tex_coords;
 
+// Underwater fog variables
+out float visibility;
+out vec4 world_coords;
+const float density = 0.007;
+const float gradient = 1;
+
 uniform float time;
 uniform mat4 model, view, projection;
 
@@ -82,6 +88,7 @@ vec3 gerstner_wave(vec2 position, float time, inout vec3 normal) {
 
 void main() {
     vec3 newNormal = normal;
+    world_coords = model * vec4(position, 1);
     pos = position;
     pos.y += gerstner_wave(position.xz, time, newNormal).y;
     gl_Position = projection * view * model * vec4(pos, 1);
@@ -94,4 +101,6 @@ void main() {
     my_normal = nit * normal;
 
     frag_tex_coords = uv_coords;
+
+    visibility = 1;
 }

@@ -580,7 +580,6 @@ class Boids:
 
     def edges(self):
         """ If the boids hit an edge of the box, its velocity along this axis is inverted and so is the acceleration """
-        # For now, in a box of size 5
         indices = [i for i in range(self.number)]
         for index, boid, position, orientation, velocity, acceleration in zip(indices, self.boids, self.positions, self.orientations, self.velocities, self.accelerations):
             new_orientation = copy.deepcopy(orientation)
