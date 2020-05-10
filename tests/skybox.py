@@ -19,8 +19,7 @@ def main():
 
     # Scene
     skybox = Skybox(skybox_shader, "../img/skybox/right.png", "../img/skybox/left.png", "../img/skybox/top.png", "../img/skybox/bottom.png", "../img/skybox/front.png", "../img/skybox/back.png")
-    scene.generate_terrain("../img/sand.jpg", "../img/perlin_noise.png", 2000, 10000)
-
+    
     scene.add_skybox(skybox)
     
     scene.viewer.run()
