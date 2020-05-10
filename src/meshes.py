@@ -1,4 +1,8 @@
 #!/usr/bin/env python3
+"""
+Mesh classes
+"""
+
 from src.viewer import *
 from src.nodes import *
 import time
@@ -6,9 +10,9 @@ import time
 MAX_BONES = 128
 MAX_VERTEX_BONES = 4
 
-# mesh to refactor all previous classes
-class Mesh:
 
+class Mesh:
+    """ Mesh to refactor all previous classes """
     def __init__(self, shader, attributes, index=None):
         self.shader = shader
         names = ['view', 'projection', 'model']
@@ -28,7 +32,6 @@ class Mesh:
 
 class PhongMesh(Mesh):
     """ Mesh with Phong illumination """
-
     def __init__(self, shader, attributes, index=None,
                  light_dir=(0, -1, 0),   # directionnal light (in world coords)
                  k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(1, 1, 1), s=16):
@@ -66,8 +69,7 @@ class PhongMesh(Mesh):
 
 
 class ComplexMesh(PhongMesh):
-    """ Simple first textured object """
-
+    """ Textured and illuminated mesh """
     def __init__(self, shader, texture, attributes, index=None,
                  light_dir=(0, 0, 0),  # directional light (in world coords)
                  k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(1, 1, 1), s=16):
@@ -109,7 +111,7 @@ class ComplexMesh(PhongMesh):
 
 
 class SkinnedMesh:
-    """class of skinned mesh nodes in scene graph """
+    """ Class of skinned mesh nodes in scene graph """
     def __init__(self, shader, texture, attributes, bone_nodes, bone_offsets, index=None):
         self.shader = shader
 
@@ -122,8 +124,7 @@ class SkinnedMesh:
         self.texture = texture
         
     def draw(self, projection, view, _model):
-        """ skinning object draw method """
-
+        """ Skinning object draw method """
         shid = self.shader.glid
         GL.glUseProgram(shid)
 
@@ -211,9 +212,8 @@ def load(file, shader, light_dir=(0, 0, 0), tex_file=None):
     return meshes
 
 
-# Il va falloir tout adapter au niveau des noeuds et éventuellement des meshes
 def load_skinned(file, shader, tex_file=None):
-    """load resources from file using assimp, return node hierarchy """
+    """ load resources from file using assimp, return node hierarchy """
     try:
         pp = assimpcy.aiPostProcessSteps
         flags = pp.aiProcess_Triangulate | pp.aiProcess_GenSmoothNormals | pp.aiProcess_FlipUVs

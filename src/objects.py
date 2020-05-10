@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 """
 Python OpenGL practical application.
-petit souci avec la lumière on dirait, pour la direction?
-peut-etre probleme lie aux normales
 """
 
 import copy
@@ -17,7 +15,6 @@ from src.nodes import *
 class Scene:
     """ General scene class """
     def __init__(self, shaders_dir, light_dir, camera_dist):
-        """ Maybe add rotations in the viewer initialisation """
         self.viewer = Viewer(distance = camera_dist)
         self.shaders = {
             'color': Shader(shaders_dir+"color.vert", shaders_dir+"color.frag"),
@@ -135,7 +132,6 @@ class Scene:
 class Object:
     """ Generic object """
     def __init__(self, shader, name, obj_pos=None, light_dir=(0, 0, 0), position=(0, 0, 0), scaling=(1, 1, 1), rotation_axis=(0, 0, 0), rotation_angle=0, rotation_mat=None, tex_file=None, animated=False):
-        # Maybe using **kwargs to pass a dictionary
         self.name = name
         self.parent = None
         if obj_pos is not None:
@@ -243,13 +239,6 @@ class Object:
                 child.key_handler(key)
 
 
-class Cylinder(Node):
-    """ Very simple cylinder based on practical 2 load function """
-    def __init__(self, shader):
-        super().__init__()
-        self.add(*load('cylinder.obj', shader))  # just load cylinder from file
-
-
 class Surface(Mesh):
     """ Generic surface """
     def __init__(self, texture_map, max_height = 10, size = 50, light_dir=(0, 1, 0),
@@ -266,7 +255,6 @@ class Surface(Mesh):
         self.wrap_mode, self.filter_mode = next(self.wrap), next(self.filter)
         self.texture_map = texture_map
         # setup texture and upload it to GPU
-        # Peut-être aussi vérifier pour names
         self.texture = Texture(texture_map, self.wrap_mode, *self.filter_mode)
         self.caustics = caustics
         if caustics is not None:
@@ -310,8 +298,6 @@ class Surface(Mesh):
 
 
 class Attributes:
-    # Ce serait bien de pouvoir mettre compute_normal dans cette classe (trouver un moyen
-    # de les calculer indépendamment de la height_map ?)
     def __init__(self, texture_map, max_color, max_height, size):
         self.texture_map = Image.open(texture_map).convert('RGBA')
         self.max_color = max_color
@@ -348,7 +334,6 @@ class TerrainAttributes(Attributes):
         """
         Compute the normal of the vertex at position (x, y, z)
         """
-        # cf. video, retrouver la source ecrite
         height_left = self.get_height(x-1, z)
         height_right = self.get_height(x+1, z)
         height_up = self.get_height(x, z-1)
@@ -461,7 +446,6 @@ class WaterAttributes(Attributes):
 
 class Terrain(Surface):
     """ Simple first textured object """
-    # Ajouter assertion si fichiers non trouvés
     def __init__(self, texture_map, height_map, shader, translation = 0, max_color = 256, max_height = 10, size = 50,
                  light_dir=(0, 1, 0), k_a=(0, 0, 0), k_d=(1, 1, 0), k_s=(0.1, 0.1, 0.1), s=16, caustics=None, begin_time=None):
         self.attrib = TerrainAttributes(texture_map, height_map, translation, max_color, max_height, size)
@@ -551,14 +535,9 @@ class Water(Surface):
 
 
 class Boids:
-    """
-    Testing phase
-    """
-    # En ajoutant les contraintes, l'orientation déconne
+    """ Boids model """
     def __init__(self, shader, number, model, scaling, index, tex_file=None):
-        """
-        For now, number has to be a perfect cube
-        """
+        """ For now, number has to be a perfect cube """
         self.index = index      # used in Scene.add
         self.number = number
         self.positions = []
@@ -597,17 +576,11 @@ class Boids:
             rotation_mat = rotate(self.orientations[i], 180) @ rotate(axis, angle) @ rotate(vec(0, 0, 1), 180)
             roots[i].add(Object(shader, "boid_{}".format(i), model, rotation_mat=rotation_mat, tex_file=tex_file, animated=True))
 
-            # self.boids.append(Object(shader, "boid_{}".format(i), model, position=self.positions[i], scaling=(scale, scale, scale)))
             self.boids.append(roots[i])
 
-        # self.transforms = [boid.transform for boid in self.boids]
-       
     def edges(self):
-        """
-        If the boids hit an edge of the box, its velocity along this axis is inverted and so is the acceleration
-        """
-        # For now, in a box of size 5, but otherwise the function is ok except for orientation
-        # Sometimes the up vector is not preserved
+        """ If the boids hit an edge of the box, its velocity along this axis is inverted and so is the acceleration """
+        # For now, in a box of size 5
         indices = [i for i in range(self.number)]
         for index, boid, position, orientation, velocity, acceleration in zip(indices, self.boids, self.positions, self.orientations, self.velocities, self.accelerations):
             new_orientation = copy.deepcopy(orientation)
@@ -625,8 +598,7 @@ class Boids:
                 axis = np.cross(orientation, new_orientation)
                 # Angle changed from radians to degrees
                 angle = np.arccos(np.dot(orientation, new_orientation)) * 360 / (2 * np.pi)
-                # Rotations of 180 degrees to preserve the up vector of the boid cf. schema
-                # Bug, il faudrait considérer le up vector (0, 1, 0) d'une certaine manière
+                # Rotations of 180 degrees to preserve the up vector of the boid
                 rotation_mat = rotate(new_orientation, 180) @ rotate(axis, angle) @ rotate(orientation, 180)
 
                 for child in boid.node.children.values():
@@ -636,9 +608,7 @@ class Boids:
             self.orientations[index] = copy.deepcopy(new_orientation)
 
     def alignement(self):
-        """
-        Alignement of the orientation of a boid
-        """
+        """ Alignement of the orientation of a boid """
         for index in range(self.number):
             direction = vec(0, 0, 0)
             average = vec(0, 0, 0)
@@ -655,9 +625,7 @@ class Boids:
                 self.accelerations[index] += direction
 
     def cohesion(self):
-        """
-        Cohesion rule
-        """
+        """ Cohesion rule """
         for index in range(self.number):
             direction = vec(0, 0, 0)
             center_of_mass = vec(0, 0, 0)
@@ -679,9 +647,7 @@ class Boids:
                 self.accelerations[index] += self.deltat * direction
 
     def separation(self):
-        """
-        Separation rule
-        """
+        """ Separation rule """
         for index in range(self.number):
             direction = vec(0, 0, 0)
             average = vec(0, 0, 0)
