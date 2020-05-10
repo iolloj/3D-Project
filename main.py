@@ -83,23 +83,23 @@ def main():
     # Hierarchical keyboard control
     rotation_matrix = rotate((0, 1, 0), 45) @ rotate((1, 0, 0), 45)
     x_rotation = {"rotation_control": True,
-                  "key_up": glfw.KEY_DOWN,
-                  "key_down": glfw.KEY_UP,
+                  "key_up": glfw.KEY_S,
+                  "key_down": glfw.KEY_W,
                   "axis": (1, 0, 0)
                  }
     y_rotation = {"rotation_control": True,
-                  "key_up": glfw.KEY_RIGHT,
-                  "key_down": glfw.KEY_LEFT,
-                  "axis": (0, 1, 0)
+                  "key_up": glfw.KEY_D,
+                  "key_down": glfw.KEY_A,
+                  "axis": (0, 0, 1)
                  }
 
-    # cube_root = Object(color_shader, "cube_root", "obj/others/cube/cube.obj", position=(10, -50, 200), scaling=(0.0001, 0.0001, 0.0001))
-    # granit_cube = Object(color_shader, "granit_cube", "obj/others/cube/cube.obj", scaling=(1e5, 1e5, 1e5), tex_file="img/granit.jpg")
-    # cube = Object(color_shader, "cube", "obj/others/cube/cube.obj", position=(0, 0.85, 0), scaling=(0.7, 0.7, 0.7))
+    anim_root = Object(color_shader, "anim_root", "obj/others/cube/cube.obj", position=(10, -50, 200), rotation_axis=(1, 0, 0), rotation_angle=-90, scaling=(0.0001, 0.0001, 0.0001))
+    anim_fish1 = Object(color_shader, "anim_fish1", "obj/Fish/BlueStarfish/BluieStarfish.fbx", scaling=(1e4, 1e4, 1e4), tex_file="obj/Fish/BlueStarfish/BlueStarfish_Base_Color.png")
+    anim_fish2 = Object(color_shader, "anim_fish", "obj/Fish/BlueStarfish/BluieStarfish.fbx", position=(0, 0, 1), scaling=(0.7, 0.7, 0.7), tex_file="obj/Fish/BlueStarfish/BlueStarfish_Base_Color.png")
 
-    # granit_cube.add(cube, rotation_control=y_rotation)
-    # cube_root.add(granit_cube, rotation_control=x_rotation)
-    # scene.add(cube_root)
+    anim_fish1.add(anim_fish2, rotation_control=y_rotation)
+    anim_root.add(anim_fish1, rotation_control=x_rotation)
+    scene.add(anim_root)
     
     
     # Skybox
