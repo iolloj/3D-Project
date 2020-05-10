@@ -108,6 +108,28 @@ def main():
 
     print("Scene successfully loaded")
 
+    # Keyboard controls
+    print("+---------------------------+")
+    print("|     Keyboard controls     |")
+    print("+---------------------------+")
+    print("")
+    print("(QWERTY keyboard)")
+    print("")
+    print("")
+    print("Bird animation:")
+    print("                 Left | Right")
+    print("")
+    print("Starfish animation:")
+    print("                       W")
+    print("                     A S D")
+    print("")
+    print("Toggle polygon mode:")
+    print("                       T")
+    print("")
+    print("Quit:")
+    print("       Q")
+
+
     scene.viewer.run()
 
 
