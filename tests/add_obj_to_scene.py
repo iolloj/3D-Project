@@ -10,11 +10,6 @@ sys.path.insert(1, '../')
 from src import *
 
 
-##### Problems
-# When adding the granit_cube, there is more illumination on illuminated objects, why? Even worse with the rabbit
-# It may be due to default parameters, or some kind of parameters initialization: check load and Object
-
-
 def main():
     # Scene creation
     scene = Scene("../shaders/", light_dir=(0, 1, 0), camera_dist=10)
