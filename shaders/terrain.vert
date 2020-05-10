@@ -15,7 +15,7 @@ out vec2 frag_tex_coords;
 out float visibility;
 out vec4 world_coords;
 const float density = 0.007;
-const float gradient = 1;
+const float gradient = 1.3;
 
 void main() {
     pos = position;
@@ -36,5 +36,4 @@ void main() {
     // Underwater fog
     float distance = length(pos_to_cam.xyz);
     visibility = exp(-pow((distance * density), gradient));
-    visibility = clamp(visibility, 0.0, 1.0);
 }
