@@ -48,5 +48,5 @@ void main() {
 
     // Underwater fog
     if (world_coords.y < 0)
-            out_color = mix(vec4(0.1, 0.1, 0.1, 1), out_color, visibility);
+            out_color = mix(vec4(0.0, 0.0, 0.6, 1), out_color, visibility);
 }

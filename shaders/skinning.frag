@@ -16,5 +16,5 @@ void main()
 
     // Underwater fog
     if (wPosition4.y < 0)
-        outColor = mix(vec4(0.1, 0.1, 0.1, 1), outColor, visibility);
+        outColor = mix(vec4(0.0, 0.0, 0.6, 1), outColor, visibility);
 }
