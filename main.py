@@ -43,29 +43,35 @@ def main():
     dolphin = Object(skinning_shader, "dolphin", "obj/Fish/BottlenoseDolphin/BottleNoseDolphin.fbx", scaling=(0.01, 0.01, 0.01), rotation_axis=(0, 1, 0), rotation_angle=45, tex_file="obj/Fish/BottlenoseDolphin/BottlenoseDolphin_Base_Color.png", animated=True)
     scene.add(dolphin, keyframes=dolphin_keyframes)
 
-    #Loading and adding Hercules to the scene TODO Tourver la bonne rotation
+    #Loading and adding Hercules to the scene
     Hercules = Object(color_shader, "Hercules", "obj/others/hercules/Hercules.obj", position=(10, -20, 150), scaling=(0.7, 0.7, 0.7 ), rotation_axis=(1, 0, 0), rotation_angle=-90, tex_file="obj/others/hercules/Hercules.jpg")
     scene.add(Hercules)
     
-    #Loading the two columns, ionic and ionic_2
+    #Loading the two columns
     column = Object(color_shader, "column", "obj/others/ionic/ionic.obj", position=(50, 20, 0), scaling=(0.2, 0.2, 0.2), rotation_axis=(1, 0, 0), rotation_angle=-100)
     column_2 = Object(color_shader, "column_2", "obj/others/ionic/ionic.obj", position=(55, 25, 10), scaling=(0.2, 0.2, 0.2), rotation_axis=(1, 0, 0), rotation_angle=-100)
     
     #Adding the columns to the scene
     scene.add(column, column_2)
     
-    seaweed = Object(color_shader, "seaweed", "obj/others/seaweed/seaweed.dae", position=(5, -35, 150), scaling=(5, 5, 5), rotation_axis=(0, 1, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
-    scene.add(seaweed)
+    #seaweeds
+    seaweed = Object(color_shader, "seaweed", "obj/others/seaweed/seaweed.dae", position=(5, -35, 145), scaling=(5, 5, 5), rotation_axis=(0, 1, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
+    seaweed_2 = Object(color_shader, "seaweed_2", "obj/others/seaweed/seaweed.dae", position=(0, -35, 150), scaling=(5, 5, 5), rotation_axis=(0, 1, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
+    seaweed_3 = Object(color_shader, "seaweed_3", "obj/others/seaweed/seaweed.dae", position=(10, -35, 155), scaling=(5, 5, 5), rotation_axis=(0, 1, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
+    seaweed_4 = Object(color_shader, "seaweed_4", "obj/others/seaweed/seaweed.dae", position=(-10, -35, 155), scaling=(5, 5, 5), rotation_axis=(0, 1, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
+    seaweed_5 = Object(color_shader, "seaweed_5", "obj/others/seaweed/seaweed.dae", position=(-5, -38, 160), scaling=(5, 5, 5), rotation_axis=(0, 1.2, 0), rotation_angle=-100, tex_file = "obj/others/seaweed/seaweed.png" )
+    scene.add(seaweed, seaweed_2, seaweed_3, seaweed_4, seaweed_5)
         
     
-    #Adding a flying bird around the columns
+    #Flying bird around the columns
     flying_bird = Object(color_shader, "Flying Brid", "obj/others/bird/base.fbx", position=(100, 100, 120), scaling=(3, 3, 3), rotation_mat=rotation_bird, tex_file = "obj/others/bird/body_baseColor.png")
     column.add(flying_bird, rotation_control=anim)
     
-    
+    #animated seahorse
     seahorse = Object(skinning_shader, "seahorse", "obj/Fish/SeaHorse/SeaHorse.fbx", position=(5, -20, 150), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/SeaHorse/SeaHorse_Base_Color.png", animated=True)
     scene.add(seahorse)
 
+    #animated fish
     reefFish = Object(skinning_shader, "reefFish", "obj/Fish/ReefFish20/reeffish20.fbx", position=(-25, -8, 140), scaling=(0.02, 0.02, 0.02), rotation_axis=(0, 1, 0), rotation_angle=-90, tex_file="obj/Fish/ReefFish20/ReefFish20_Base_Color.png", animated=True)
     scene.add(reefFish)
     
