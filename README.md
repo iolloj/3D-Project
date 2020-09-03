@@ -33,7 +33,7 @@ The following features have been implemented:
 Here is how to run the tests and the app.
 
 ## Scene examples
-* Gastner Waves : 
+* Gerstner Waves : 
 <img src="snapshots/waves.png" width="500" class="center">
 
 * Underwater Caustics : 
