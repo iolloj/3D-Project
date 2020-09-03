@@ -33,13 +33,15 @@ The following features have been implemented:
 Here is how to run the tests and the app.
 
 ## Scene examples
-* Gastner Waves :\
-![alt text](snapshots/waves.png)
-* Underwater Caustics :\
-![alt text](snapshots/caustics_scene.png)
-![alt text](snapshots/caustics_scen2.png)
-* Final scene :\
-![alt text](snapshots/final_scene_conclu.png)
+* Gastner Waves : 
+<img src="snapshots/waves.png" width="500" class="center">
+
+* Underwater Caustics : 
+<img src="snapshots/caustics_scene.png" width="500" align="center">
+<img src="snapshots/caustics_scen2.png" width="500" align="center">
+
+* Final scene : 
+<img src="snapshots/final_scene_conclu.png" width="500" align="center">
 
 ### General tests
 
