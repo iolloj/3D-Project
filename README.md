@@ -33,12 +33,12 @@ The following features have been implemented:
 Here is how to run the tests and the app.
 
 ## Scene examples
-Gastner Waves :
+* Gastner Waves :
 ![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/waves.png)
-Underwater Caustics :
+* Underwater Caustics :
 ![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/caustics_scene.png)
 ![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/caustics_scen2.png)
-Final scene :
+* Final scene :
 ![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/final_scene_conclu.png)
 
 ### General tests
