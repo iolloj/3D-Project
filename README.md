@@ -34,12 +34,12 @@ Here is how to run the tests and the app.
 
 ## Scene examples
 Gastner Waves :
-![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/waves.png)
+<img src="https://raw.githubusercontent.com/iolloj/3D-Project/tree/master/snapshots/waves.png" width="900"/>
 Underwater Caustics :
-![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/caustics_scene.png)
-![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/caustics_scen2.png)
+<img src="https://raw.githubusercontent.com/iolloj/3D-Project/tree/master/snapshots/caustics_scene.png" width="900"/>
+<img src="https://raw.githubusercontent.com/iolloj/3D-Project/tree/master/snapshots/caustics_scene.png2" width="900"/>
 Final scene :
-![alt text](https://github.com/iolloj/3D-Project/tree/master/snapshots/final_scene_conclu.png)
+<img src="https://raw.githubusercontent.com/iolloj/3D-Project/tree/master/snapshots/final_scene_conclu.png" width="900"/>
 
 ### General tests
 
